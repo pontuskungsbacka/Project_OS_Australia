@@ -26,9 +26,9 @@ layout = [
         [
             html.Li(
                 [
-                    html.B("Michelin logo: "),
-                    "Nikolaos Dimos, CC BY-SA 3.0 ",
-                    html.A("via Wikimedia Commons", href="https://creativecommons.org/licenses/by-sa/3.0"),
+                    html.B("Ikoner: "),
+                    "-",
+                    html.A("-", href="https://creativecommons.org/licenses/by-sa/3.0"),
                     ".",
                 ],
             ),
