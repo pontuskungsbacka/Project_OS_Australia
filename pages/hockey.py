@@ -11,7 +11,7 @@ PAGE_TITLE = "Landhockey"
 
 dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/hockey", order=6)
 
-df = load_olympics_data()
+df = load_olympics_data() #Laddar en csv med os athlete i en df
 
 def layout():
     hockey = df[df["Sport"] == "Hockey"]
