@@ -24,8 +24,6 @@ def layout():
         nbins=50 
     )
 
-    fig_hist1.show()
-
     return [
         html.H3("Åldersanalys för Australien", className="mb-3"),
         html.P(
