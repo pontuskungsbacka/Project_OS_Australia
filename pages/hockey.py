@@ -13,6 +13,20 @@ dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", p
 
 df = load_olympics_data() #Laddar en csv med os athlete i en df
 
+hockey_all = df[(df["Sport"] == "Hockey") & (df["Medal"].notna())]
+hockey_unique = hockey_all.drop_duplicates(
+    subset=["Year", "Season", "Event", "NOC", "Medal"]
+)
+aus_hockey = hockey_unique[hockey_unique["NOC"] == "AUS"]
+
+aus_long = (
+    aus_hockey
+    .groupby(["Year", "Sex", "Medal"])
+    .size()
+    .reset_index(name="Count")
+)
+
+
 def layout():
     hockey = df[df["Sport"] == "Hockey"]
     hockey = hockey[hockey["Medal"].notna()]
@@ -26,9 +40,17 @@ def layout():
 
     fig_hockey_medals = px.bar(
         top10, x=medal_values, y="NOC",
+        barmode="stack",
         color_discrete_map={"Gold":"#FFD700", "Silver": "#C0C0C0", "Bronze": "#CD7F32"}, #Uppdatera färgval så vi alla har samma!
-        title="Top 10 länder i landhockey"
+        title="Top 10 länder i landhockey",
+        labels={
+            "NOC": "Land",
+            "value": "Antal medaljer",
+            "variable": "Valör",
+        },
     )
+
+    
     return [
         html.H3("Landhockey", className="mb-3"),
         html.P(
@@ -103,10 +125,22 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4("Andra grafen kommer här"),
+                                html.H4("År och kön på medaljtagarna"),
                                 html.P("""
-                                    Text om graf. längre text för att se hur det ser ut nör det är mer text
+                                    Text om graf. längre text för att se hur det ser ut när det är mer text
                             """),
+                                html.Label("Kön"),
+                                dcc.Dropdown(
+                                    id="sex-dropdown-hockey",
+                                    options=[
+                                        {"label": "Båda", "value": "both"},
+                                        {"label": "Herr", "value": "M"},
+                                        {"label": "Dam", "value": "F"},
+                                    ],
+                                    value="both",
+                                    clearable=False,
+                                    style={"marginBottom": "10px"},
+                                ), 
                                 dcc.Graph(id="id-second-graph"),
                             ]
                         ),
@@ -149,3 +183,39 @@ def layout():
             class_name="g-3",
         ),
     ]
+
+@callback(
+        Output("id-second-graph", "figure"),
+        Input("sex-dropdown-hockey", "value"),
+)
+
+def update_aus_hockey_graph(selected_sex):
+    dff = aus_long.copy()
+    if selected_sex == "both":
+        dff_plot = (dff.groupby(["Year", "Medal"])["Count"].sum().reset_index())
+        title_suffix = "(Herr & Dam)"
+    else:
+        dff_plot = dff[dff["Sex"] == selected_sex]
+        title_suffix= "(Herr)" if selected_sex == "M" else "(Dam)"
+
+    fig = px.bar(
+        dff_plot,
+        x="Year",
+        y="Count",
+        color="Medal",
+        barmode="stack",
+        category_orders={"Medal": ["Bronze", "Silver", "Gold"]},
+        color_discrete_map={
+            "Gold": "#FFD700",
+            "Silver": "#C0C0C0",
+            "Bronze": "#CD7F32",
+        },
+        labels={
+            "Year": "År",
+            "Count": "Antal medaljer",
+            "Medal": "Valör",
+        },
+        title=f"Australiens medaljer i landhockey per år{title_suffix}",
+    )
+
+    return fig
