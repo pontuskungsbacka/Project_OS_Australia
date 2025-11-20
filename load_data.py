@@ -5,7 +5,7 @@ import hashlib as hl
 data_dir = Path("data")
 
 def load_olympics_data():
-    athletes = pd.read_csv(data_dir / "athlete_events.csv")
+    athletes = pd.read_csv(data_dir / "athlete_events_fixed_age.csv")
     regions = pd.read_csv(data_dir / "noc_regions.csv")
 
     #anonymisering 
