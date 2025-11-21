@@ -10,7 +10,7 @@ TITLE = "Olympiska spelen Analys - Team Australien"
 OS_LOGO = "assets/olympic-logo.svg"
 PAGE_TITLE = "Medaljer anlys"
 
-dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/medals", order=1)
+dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/", order=1)
 """
 To load and fixing the data 
 """
@@ -296,6 +296,29 @@ def layout():
         ),
         dbc.Row(
             [   
+                dbc.Col(
+                    dbc.Card(
+                        dbc.CardBody(
+                            [
+                                html.Ul(
+                                    [
+                                        html.Li([
+                                            html.Span("Guld: ", id="gold_medals",className="gold"),
+                                        ], className="atom-list-li"),
+                                        html.Li([
+                                            html.Span("Silver: ", id="silver_medals",className="silver"),
+                                        ], className="atom-list-li"),
+                                        html.Li([
+                                            html.Span("Brons: ", id="bronze_medals",className="bronze"),
+                                        ], className="atom-list-li"),
+                                    ],className="atom-list-ul parent-list "
+                                )
+                            ]
+                        ),
+                    ),
+                    class_name="mb-3",
+                    width=12,
+                ),
                 dbc.Col(
                     dbc.Card(
                         dbc.CardBody(
