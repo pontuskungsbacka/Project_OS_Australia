@@ -20,7 +20,7 @@ NAVBAR = {
         "Genusanalys": {"icon": "bi bi-gender-ambiguous", "relative_path": "/gender", "class": "nav-item-team"},
     },
     "OS Sport Analys": {
-        "Simmning": {"icon": "swm-logo", "relative_path": "/swimming", "class": "nav-item-sport"},
+        "Simning": {"icon": "swm-logo", "relative_path": "/swimming", "class": "nav-item-sport"},
         "Rodd": {"icon": "row-logo", "relative_path": "/rowing", "class": "nav-item-sport"},
         "Landhockey": {"icon": "hoc-logo", "relative_path": "/hockey", "class": "nav-item-sport"},
         "Ridning": {"icon": "equ-logo", "relative_path": "/equestrian", "class": "nav-item-sport"},
