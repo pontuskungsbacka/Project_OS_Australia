@@ -20,7 +20,9 @@ df.loc[(df["ID"] == 118133) & (df["Year"] == 2012), "Medal"] = "Gold"
 
 # Filter medals
 medals = df[df['Medal'].notna()]
-medals_filtered = medals.drop_duplicates(["Year", "Event", "Season", "Medal", "NOC"])
+medals_filtered = medals.drop_duplicates(
+    subset=["Year", "Season", "Event", "NOC", "Medal"]
+)
 """
 Prepare the dataframe for plotting medal
 """
@@ -293,7 +295,7 @@ def layout():
         """
         ),
         dbc.Row(
-            [
+            [   
                 dbc.Col(
                     dbc.Card(
                         dbc.CardBody(
