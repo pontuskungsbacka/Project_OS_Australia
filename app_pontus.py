@@ -14,10 +14,10 @@ app._favicon = ("assets/favicon.ico")
 server = app.server
 NAVBAR = {
     "Team Australia": {
-        "Översikt analys": {"icon": "bi bi-clipboard-data", "relative_path": "/", "class": "nav-item-team"},
-        "Medaljer analys": {"icon": "bi bi-award", "relative_path": "/medals", "class": "nav-item-team"},
-        "Åldersanalys": {"icon": "bi bi-person-vcard", "relative_path": "/age", "class": "nav-item-team"},
-        "Genusanalys": {"icon": "bi bi-gender-ambiguous", "relative_path": "/gender", "class": "nav-item-team"},
+        "Medaljer": {"icon": "bi bi-award", "relative_path": "/", "class": "nav-item-team"},
+        "Deltagande": {"icon": "bi bi-clipboard-data", "relative_path": "/participation", "class": "nav-item-team"},
+        "Ålderar": {"icon": "bi bi-person-vcard", "relative_path": "/age", "class": "nav-item-team"},
+        "Genus": {"icon": "bi bi-gender-ambiguous", "relative_path": "/gender", "class": "nav-item-team"},
     },
     "OS Sport Analys": {
         "Simning": {"icon": "swm-logo", "relative_path": "/swimming", "class": "nav-item-sport"},
