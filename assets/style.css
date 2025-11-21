@@ -121,3 +121,32 @@
 .nav-item .nav-link.active .team-australia-logo {
     background-color: #fff;          /* white icons on active */
 }
+
+.atom-medals ul li span {
+    width: 72px;
+    height: 72px;
+    line-height: 72px;
+    font-size: 20px;
+    font-weight: 700;
+}
+.atom-medals ul li {
+    list-style: none;
+    display: inline-block;
+    position: relative;
+    margin-left: -5px;
+}
+
+.atom-medals ul {
+    margin: 0;
+    padding: 0;
+}
+
+.atom-medals ul li span.bronze span {
+    background-color: #9a7e3d;
+}
+.atom-medals ul li span.silver span {
+    background-color: #c0c0c0;
+}
+.atom-medals ul li span.gold span {
+    background-color: #ffd700;
+}
