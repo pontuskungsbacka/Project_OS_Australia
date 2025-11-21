@@ -21,14 +21,14 @@ def layout():
     fig_hist1 = px.histogram(   
         australia_rows_uniqueID, 
         x='Age', 
-        nbins=50 
+        nbins=50
     )
 
     return [
         html.H3("Åldersanalys för Australien", className="mb-3"),
         html.P(
-            """Åldrar hos australiensiska atleter i de Olympiska spelen. Denna sida ger en sammanfattning av
-        viktiga statistik så som yngsta och älsta deltagare historiskt och medelåldern. Se även visualiseringar relaterade till åldersfördelningen bland Australiens prestationer i de Olympiska spelen.
+            """Åldrar hos atleter från Australien i de Olympiska spelen. Denna sida ger en sammanfattning av
+        viktig statistik så som yngsta och älsta deltagare historiskt och medelåldern. Se även en visualisering över åldersfördelningen bland Australiens deltagare i OS.
         """
         ),
         dbc.Row(
@@ -42,7 +42,7 @@ def layout():
                                     id="youngest-athlete",
                                     className="card-title",
                                 ),
-                                html.H6("Yngsta deltagare - detta var idrottare i simning och rodd under 60- och 70-talet.", className="card-subtitle"),
+                                html.H6("Yngsta deltagarna. Detta var idrottare i simning och rodd under 60- och 70-talet.", className="card-subtitle"),
                             ]
                         ),
                     ),
@@ -59,7 +59,7 @@ def layout():
                                     id="average-athlete",
                                     className="card-title",
                                 ),
-                                html.H6("Genomsnittlig idrottare ålder", className="card-subtitle"),
+                                html.H6("Genomsnittlig ålder", className="card-subtitle"),
                             ]
                         ),
                     ),
@@ -91,55 +91,10 @@ def layout():
                         ),
                     ),
                     class_name="mb-3",
-                    md=6,
+                    md=12,
                     sm=12,
                 ),
-                dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.H4("Andra grafen kommer här"),
-                                html.P("""
-                                    Text om graf. längre text för att se hur det ser ut nör det är mer text
-                            """),
-                                dcc.Graph(id="id-second-graph"),
-                            ]
-                        ),
-                    ),
-                    class_name="mb-3",
-                    md=6,
-                    sm=12,
-                ),
-                dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.H4("Tredje grafen kommer här"),
-                                html.P("Text om graf."),
-                                dcc.Graph(id="id-third-graph"),
-                            ]
-                        ),
-                    ),
-                    class_name="mb-3",
-                    md=6,
-                    sm=12,
-                ),
-                dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.H4("Fjärde grafen kommer här"),
-                                html.P(
-                                    """Text om graf. Längre text för att se hur det ser ut när det är mer text."""
-                                ),
-                                dcc.Graph(id="id-fourth-graph"),
-                            ]
-                        ),
-                    ),
-                    class_name="mb-3",
-                    md=6,
-                    sm=12,
-                ),
+                
             ],
             class_name="g-3",
         ),

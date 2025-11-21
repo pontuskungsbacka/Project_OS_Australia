@@ -52,7 +52,7 @@ def layout():
         html.H3("Rodd - alla länder", className="mb-3"),
         html.P(
            """En analys av rodd i Olympiska spelen. Denna sida ger en sammanfattning av viktig statistik och
-        visualiseringar av olika aspekter av rodd i de Olympiska spelen.
+        visualiseringar av olika aspekter av rodd i de Olympiska spelen. Rodd är bara med i sommar-OS.
         """
         ),
         dbc.Row(
@@ -79,11 +79,11 @@ def layout():
                         dbc.CardBody(
                             [
                                 html.H4(
-                                    "8 olympiska spel",
-                                    id="Number-of-years-rowing",
+                                    "1,3 OS",
+                                    id="average-years-rowing",
                                     className="card-title",
                                 ),
-                                html.H6("Är högsta antalet gånger som någon tävlat i rodd i OS", className="card-subtitle"),
+                                html.H6("Genomsnittligt antal gånger som rodd-deltagare tävlar i OS", className="card-subtitle"),
                             ]
                         ),
                     ),
@@ -95,8 +95,12 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4("25 st", id="total-events-rowing", className="card-title"),
-                                html.H6("Rodd-evenemang som funnits. Dock ej under samma OS. Senaste OS var det 14 st.", className="card-subtitle"),
+                                html.H4(
+                                    "8 OS", 
+                                    id="max-number-of-years-rowing",
+                                    className="card-title"
+                                ),
+                                html.H6("Högsta antalet OS som en person tävlat inom rodd", className="card-subtitle"),
                             ]
                         ),
                     ),
@@ -115,7 +119,7 @@ def layout():
                         ),
                     ),
                     class_name="mb-3",
-                    md=6,
+                    md=12,
                     sm=12,
                 ),
                 dbc.Col(
@@ -131,37 +135,7 @@ def layout():
                         ),
                     ),
                     class_name="mb-3",
-                    md=6,
-                    sm=12,
-                ),
-                dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.H4("Tredje grafen kommer här"),
-                                html.P("Text om graf."),
-                                dcc.Graph(id="id-third-graph"),
-                            ]
-                        ),
-                    ),
-                    class_name="mb-3",
-                    md=6,
-                    sm=12,
-                ),
-                dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.H4("Fjärde grafen kommer här"),
-                                html.P(
-                                    """Text om graf. Längre text för att se hur det ser ut när det är mer text."""
-                                ),
-                                dcc.Graph(id="id-fourth-graph"),
-                            ]
-                        ),
-                    ),
-                    class_name="mb-3",
-                    md=6,
+                    md=12,
                     sm=12,
                 ),
             ],
