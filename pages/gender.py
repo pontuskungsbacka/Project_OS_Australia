@@ -72,10 +72,10 @@ def layout():
                             [
                                 html.H4(
                                     "-",
-                                    id="First-year-woman",
+                                    id="first-women-aus",
                                     className="card-title",
                                 ),
-                                html.H6("Första året kvinnor deltog", className="card-subtitle"),
+                                html.H6("Första året en kvinna från Australien deltog", className="card-subtitle"),
                             ]
                         ),
                     ),
@@ -89,10 +89,10 @@ def layout():
                             [
                                 html.H4(
                                     "-",
-                                    id="gender-distribution",
+                                    id="max-percent-aus",
                                     className="card-title",
                                 ),
-                                html.H6("Könfördelning i Olympiskaspelen", className="card-subtitle"),
+                                html.H6("Största kvinnodeltagandet från Australien", className="card-subtitle"),
                             ]
                         ),
                     ),
@@ -104,8 +104,8 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4("-", id="best-gender-distribution-country", className="card-title"),
-                                html.H6("Landet med bästa könsfördelningar", className="card-subtitle"),
+                                html.H4("-", id="min-percent-aus", className="card-title"),
+                                html.H6("Minsta kvinnodeltagandet från Australien", className="card-subtitle"),
                             ]
                         ),
                     ),
@@ -115,79 +115,51 @@ def layout():
                 ),
                #HÄR ÄR BÖRJAN TILL GRAF !
                 dbc.Col(
-    dbc.Card(
-        dbc.CardBody(
-            [
-                html.H4("Globalt vs Australien – könsfördelning"),
-                html.P("Växla mellan linjediagram och stapeldiagram för andel kvinnor globalt vs Australien."),
-                html.Label("Diagramtyp"),
-                dcc.Dropdown(
-                    id="gender-chart-type",
-                    options=[
-                        {"label": "Linjediagram", "value": "line"},
-                        {"label": "Stapeldiagram", "value": "bar"},
-                    ],
-                    value="line",
-                    clearable=False,
-                    style={"marginBottom": "10px"},
-                ),
-                dcc.Graph(id="gender-graph"),
-            ]
-        )
-    ),
-    class_name="mb-3",
-    width=12,
-),
-                dbc.Col(
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4("Tredje grafen kommer här"),
-                                html.P("Text om graf."),
-                                dcc.Graph(id="id-third-graph"),
-                            ]
-                        ),
-                    ),
-                    class_name="mb-3",
-                    md=6,
-                    sm=12,
-                ),
-                dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.H4("Fjärde grafen kommer här"),
-                                html.P(
-                                    """Text om graf. Längre text för att se hur det ser ut när det är mer text."""
+                                html.H4("Globalt vs Australien – könsfördelning"),
+                                html.P("Växla mellan linjediagram och stapeldiagram för andel kvinnor globalt vs Australien."),
+                                html.Label("Diagramtyp"),
+                                dcc.Dropdown(
+                                    id="gender-chart-type",
+                                    options=[
+                                        {"label": "Linjediagram", "value": "line"},
+                                        {"label": "Stapeldiagram", "value": "bar"},
+                                    ],
+                                    value="line",
+                                    clearable=False,
+                                    style={"marginBottom": "10px"},
                                 ),
-                                dcc.Graph(id="id-fourth-graph"),
+                                dcc.Graph(id="gender-graph"),
                             ]
-                        ),
+                        )
                     ),
                     class_name="mb-3",
-                    md=6,
-                    sm=12,
-                ),
-            ],
-            class_name="g-3",
-        ),
+                    width=12,
+                )
+            ])
     ]
 
 @callback(
     Output("gender-graph", "figure"),
+    Output("first-women-aus","children"),
+    Output("max-percent-aus","children"),
+    Output("min-percent-aus","children"),
     Input("gender-chart-type", "value"),
 )
 def update_gender_graph(chart_type):
     if chart_type == "bar":
-        return fig_gender_bar
+        fig = fig_gender_bar
     else:
-        return fig_gender_line
+        fig = fig_gender_line
 
-def update_cards(_):
-    first_woman_aus = df[(df["Sex"] == "F") & (df["Team"] == "Australia")]["Year"].min()
-    max_percentage_aus = compare.loc[compare["Australien"].idmax()]
-    min_percentage_aus = compare.loc[compare["Australien"].idmin()]
-
-    return first_woman_aus, max_percentage_aus, min_percentage_aus
+    first_woman_aus = int(df[(df["Sex"] == "F") & (df["Team"] == "Australia")]["Year"].min())
+    best_row = compare_reset.loc[compare_reset["Australien"].idxmax()]
+    worst_row = compare_reset.loc[compare_reset["Australien"].idxmin()]
+    
+    max_percentage_aus = f"{int(best_row["Year"])} - {best_row["Australien"]:.1f}%"
+    min_percentage_aus = f"{int(worst_row["Year"])} - {worst_row["Australien"]:.1f}%"
+    return fig, str(first_woman_aus), max_percentage_aus, min_percentage_aus
 
 
