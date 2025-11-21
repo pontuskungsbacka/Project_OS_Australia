@@ -17,6 +17,13 @@ def load_olympics_data():
     merged = pd.merge(athletes, regions, on="NOC", how="outer")
     return merged
 
+
+def remove_team_duplicated_medals(df, sport):
+    df_sport =df[df["Sport"].str.lower() == sport.lower()]
+    df_unique = df_sport.drop_duplicates(
+        subset=["Year", "Event", "NOC", "Medal"])
+    
+    return df_unique
 """
 TODO, addera filter för 1906 års tävling samt sporten Alpinism
 
