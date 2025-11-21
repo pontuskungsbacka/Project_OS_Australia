@@ -1,7 +1,9 @@
+import plotly.express as px
 import dash
 import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import Input, Output, callback, dcc, html
+from load_data import load_olympics_data
 
 TITLE = "Olympiska spelen Analys - Team Australien"
 OS_LOGO = "assets/olympic-logo.svg"
@@ -11,6 +13,31 @@ dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", p
 
 
 def layout():
+    df = load_olympics_data()
+    #merge "AUS" and "ANZ" to get both NOC:S
+    australia = df[df["NOC"].isin(["AUS", "ANZ"])]   
+
+    participation_historical_aus = (
+        australia.groupby(["Year", "Season"])["ID"]
+        .nunique()
+        .reset_index(name="Participants") 
+    )#. groupby() turns year to index
+                                                                                                                      #  .nunique() content in y-axle
+
+    fig_aus_overview= px.line(
+        participation_historical_aus,
+        x= "Year", 
+        y= "Participants",
+        color="Season",
+        markers=True,
+        title= "Australia participation 1896–2016"
+    )
+
+    fig_aus_overview.update_yaxes(
+        type="log",
+        title_text="Participants (log scale)"
+    )                   #Clearer curve. Shows growth instead of absolute counts.
+
     return [
         html.H3("Översikt analys", className="mb-3"),
         html.P(
@@ -73,7 +100,7 @@ def layout():
                             [
                                 html.H4("Första grafen kommer här"),
                                 html.P("Text om graf."),
-                                dcc.Graph(id="id-first-graph"),
+                                dcc.Graph(id="id-first-graph", figure=fig_aus_overview),
                             ]
                         ),
                     ),
@@ -119,7 +146,7 @@ def layout():
                                 html.P(
                                     """Text om graf. Längre text för att se hur det ser ut när det är mer text."""
                                 ),
-                                dcc.Graph(id="id-fourth-graph"),
+                                dcc.Graph(id="id-fourth-graph")
                             ]
                         ),
                     ),
