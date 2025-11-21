@@ -4,52 +4,57 @@ import pandas as pd
 from dash import Input, Output, callback, dcc, html
 from pathlib import Path
 import plotly.express as px
+from load_data import load_olympics_data
 
 #Import stuff move later
 TITLE = "Olympiska spelen Analys - Team Australien"
 OS_LOGO = "assets/olympic-logo.svg"
 PAGE_TITLE = "Åldersanalys"
 
-# Load data
-directory_data = Path("./data")
-
-athletes = pd.read_csv(f"{directory_data}/athlete_events.csv")
-regions = pd.read_csv(f"{directory_data}/noc_regions.csv")
-merged = pd.merge(athletes, regions, on="NOC", how="outer")
-df = merged
-
-aus = df[df["NOC"].isin(["AUS", "ANZ"])]
-gender_per_year = (
-    aus
-    .groupby(["Year", "Season", "Sex"], as_index=False)
-    .size()
-    .rename(columns={"size": "Count"})
-)
-gender_per_year["Total"] = gender_per_year.groupby(["Year", "Season"])["Count"].transform("sum")
-gender_per_year["Percent"] = gender_per_year["Count"] / gender_per_year["Total"] * 100
-gender_per_year["NOC"] = "AUS"
-
-countries = ["CAN", "SWE", "GBR"]
-
-def gender_compare(df, country):
-    country_df = df[df["NOC"] == country]
-    gender = (
-        country_df
-        .groupby(["Year", "Season", "Sex"], as_index=False)
-        .size()
-        .rename(columns={"size": "Count"})
-    )
-    gender["Total"] = gender.groupby(["Year", "Season"])["Count"].transform("sum")
-    gender["Percent"] = gender["Count"] / gender["Total"] * 100
-    gender["NOC"] = country
-    return gender
-
-df_gender = pd.concat([gender_compare(df, c) for c in countries], ignore_index=True)
-df_gender = pd.concat([df_gender, gender_per_year], axis=0)
+df = load_olympics_data()
 
 
 dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/gender", order=3)
 
+per_country_year = df.groupby(["Year","Season", "Team"])["Sex"].value_counts().unstack()
+per_country_year["Percent_women_global"] = per_country_year["F"] / (per_country_year["F"] + per_country_year["M"]) * 100
+global_avg_per_year = (per_country_year.groupby(["Year", "Season"])["Percent_women_global"].mean())
+
+df_aus = df[df["Team"] == "Australia"]
+per_year_aus = df_aus.groupby(["Year", "Season"])["Sex"].value_counts().unstack(fill_value=0)
+per_year_aus["Percent_women_aus"] = per_year_aus["F"] / (per_year_aus["F"] + per_year_aus["M"]) *100
+
+compare = pd.concat([global_avg_per_year, per_year_aus["Percent_women_aus"]], axis=1)
+compare_reset = compare.reset_index()
+compare_reset = compare_reset.rename(columns={
+    "Percent_women_global": "Globalt",
+    "Percent_women_aus": "Australien"
+})
+fig_gender_bar = px.bar(
+    compare_reset, x="Year", y=["Globalt", "Australien"],
+    barmode="group",
+    facet_row="Season",
+    labels={
+        "value": "Andel kvinnor %",
+        "variable": "Kategori",
+        "Year": "År",
+        "Season": "Säsong",
+
+    },
+    title="Andel kvinnliga deltagare - Globalt vs Australien (stapeldiagram)"
+)
+
+fig_gender_line = px.line(
+    compare_reset, x="Year", y=["Globalt", "Australien"],
+    facet_row="Season",
+    labels={
+        "value": "Andel kvinnor %",
+        "variable": "Kategori",
+        "Year": "År",
+        "Season": "Säsong",
+    },
+    title="Andel kvinnliga deltagare - Globalt vs Australien (linjediagram)"
+)
 
 def layout():
     return [
@@ -110,30 +115,29 @@ def layout():
                 ),
                #HÄR ÄR BÖRJAN TILL GRAF !
                 dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.H4("Gender Chart"),
-                                html.P("Här är en graf som visar könsfördelning över åren för valda länder."),
-                                html.Label("Välj land (NOC):"),
-                                dcc.Dropdown(
-                                    id="country-dropdown",
-                                    options=[
-                                        {"label": "Australia (AUS)", "value": "AUS"},
-                                        {"label": "Canada (CAN)", "value": "CAN"},
-                                        {"label": "Sweden (SWE)", "value": "SWE"},
-                                        {"label": "Great Britain (GBR)", "value": "GBR"},
-                                    ],
-                                    value="AUS",
-                                    clearable=False
-                                ),
-                                dcc.Graph(id="gender-graph"),
-                            ]
-                        )
-                    ),
-                    class_name="mb-3",
-                    width=12,
+    dbc.Card(
+        dbc.CardBody(
+            [
+                html.H4("Globalt vs Australien – könsfördelning"),
+                html.P("Växla mellan linjediagram och stapeldiagram för andel kvinnor globalt vs Australien."),
+                html.Label("Diagramtyp"),
+                dcc.Dropdown(
+                    id="gender-chart-type",
+                    options=[
+                        {"label": "Linjediagram", "value": "line"},
+                        {"label": "Stapeldiagram", "value": "bar"},
+                    ],
+                    value="line",
+                    clearable=False,
+                    style={"marginBottom": "10px"},
                 ),
+                dcc.Graph(id="gender-graph"),
+            ]
+        )
+    ),
+    class_name="mb-3",
+    width=12,
+),
                 dbc.Col(
                     dbc.Card(
                         dbc.CardBody(
@@ -171,27 +175,19 @@ def layout():
 
 @callback(
     Output("gender-graph", "figure"),
-    Input("country-dropdown", "value")
+    Input("gender-chart-type", "value"),
 )
-def update_gender_graph(selected_noc):
-    dff = df_gender[df_gender["NOC"] == selected_noc]
+def update_gender_graph(chart_type):
+    if chart_type == "bar":
+        return fig_gender_bar
+    else:
+        return fig_gender_line
 
-    fig = px.bar(
-        dff,
-        x="Year",
-        y="Percent",
-        color="Sex",
-        barmode="stack",
-        facet_row="Season",
-        width=900,
-        height=500,
-        hover_data={
-            "Count": True,
-            "Total": True,
-            "Percent": ":.2f",
-            "NOC": True,
-        },
-        title=f"Könsfördelning per år – {selected_noc}"
-    )
-    fig.update_layout(margin=dict(t=80, l=40, r=40, b=40))
-    return fig
+def update_cards(_):
+    first_woman_aus = df[(df["Sex"] == "F") & (df["Team"] == "Australia")]["Year"].min()
+    max_percentage_aus = compare.loc[compare["Australien"].idmax()]
+    min_percentage_aus = compare.loc[compare["Australien"].idmin()]
+
+    return first_woman_aus, max_percentage_aus, min_percentage_aus
+
+

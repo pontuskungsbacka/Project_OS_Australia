@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import Input, Output, callback, dcc, html
 import plotly.express as px
-from load_data import load_olympics_data
+from load_data import load_olympics_data, remove_team_duplicated_medals
 
 TITLE = "Olympiska spelen Analys - Team Australien"
 OS_LOGO = "assets/olympic-logo.svg"
@@ -12,11 +12,8 @@ PAGE_TITLE = "Landhockey"
 dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/hockey", order=6)
 
 df = load_olympics_data() #Laddar en csv med os athlete i en df
-
-hockey_all = df[(df["Sport"] == "Hockey") & (df["Medal"].notna())]
-hockey_unique = hockey_all.drop_duplicates(
-    subset=["Year", "Season", "Event", "NOC", "Medal"]
-)
+df = remove_team_duplicated_medals(df,"hockey")
+hockey_unique = remove_team_duplicated_medals(df, "hockey")
 aus_hockey = hockey_unique[hockey_unique["NOC"] == "AUS"]
 
 aus_long = (
@@ -118,8 +115,7 @@ def layout():
                         ),
                     ),
                     class_name="mb-3",
-                    md=6,
-                    sm=12,
+                    width=12,
                 ),
                 dbc.Col(
                     dbc.Card(
@@ -146,8 +142,7 @@ def layout():
                         ),
                     ),
                     class_name="mb-3",
-                    md=6,
-                    sm=12,
+                    width=12,
                 ),
                 dbc.Col(
                     dbc.Card(
