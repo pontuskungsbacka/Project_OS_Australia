@@ -98,7 +98,7 @@ fig = px.bar(
     orientation='h',
     color='Färger',
     color_discrete_map={
-        'Australia': '#0D5257',
+        'Australia': '#C4D600',
         'Andra länder': '#BBBCBC'
     },
     labels={
@@ -186,7 +186,7 @@ total_medals_all = sunburst_df['Year'].nunique()
 
 
 # Root: Australia with total games participated
-labels.append(f'Australia got medals in<br>{total_medals_all} Olympic Games out of {total_games_os}')
+labels.append(f'Australia got medals in<br>{total_medals_all} Olympic Games<br>out of {total_games_os}')
 parents.append('')
 values.append(sunburst_df['Count'].sum())
 colors.append('#FFFFFF')
@@ -200,10 +200,10 @@ for season in ['Summer', 'Winter']:
         participated = season_data['Year'].nunique()
         total_games = total_summer_games if season == 'Summer' else total_winter_games
         
-        labels.append(f'{season}<br>{participated}/{total_games} total olympic games with medals<br>{int(total_medals)} medals')
+        labels.append(f'{season}<br>{participated}/{total_games} total olympic games<br> with medals<br>{int(total_medals)} medals')
         parents.append('australia')
         values.append(total_medals)
-        colors.append('#BBBCBC' if season == 'Summer' else '#0E5959')
+        colors.append('#F0E13F' if season == 'Summer' else '#0E5959')
         ids.append(season.lower())
 
 # Level 2: Year per Season (with medal count)
@@ -217,7 +217,7 @@ for season in ['Summer', 'Winter']:
             labels.append(f'{year}<br>{int(year_medals)} medals')
             parents.append(season.lower())
             values.append(year_medals)
-            colors.append('#D9D9D6' if season == 'Summer' else '#3B7F7F')
+            colors.append('#EFE25F' if season == 'Summer' else '#3B7F7F')
             ids.append(f'{season.lower()}_{year}')
 
 # Level 3: Medal Type per Year
