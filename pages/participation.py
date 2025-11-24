@@ -39,7 +39,7 @@ def layout():
     )                   #Clearer curve. Shows growth instead of absolute counts.
 
     return [
-        html.H3("Deltagande", className="mb-3"),
+        html.H3("Översikt analys", className="mb-3"),
         html.P(
             """En översikt över Olympiska spelen med fokus på Team Australien. Denna sida ger en sammanfattning av
         viktiga statistik och visualiseringar relaterade till Australiens prestationer i de Olympiska spelen.
@@ -108,52 +108,8 @@ def layout():
                     md=6,
                     sm=12,
                 ),
-                dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.H4("Andra grafen kommer här"),
-                                html.P("""
-                                    Text om graf. längre text för att se hur det ser ut nör det är mer text
-                            """),
-                                dcc.Graph(id="id-second-graph"),
-                            ]
-                        ),
-                    ),
-                    class_name="mb-3",
-                    md=6,
-                    sm=12,
-                ),
-                dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.H4("Tredje grafen kommer här"),
-                                html.P("Text om graf."),
-                                dcc.Graph(id="id-third-graph"),
-                            ]
-                        ),
-                    ),
-                    class_name="mb-3",
-                    md=6,
-                    sm=12,
-                ),
-                dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.H4("Fjärde grafen kommer här"),
-                                html.P(
-                                    """Text om graf. Längre text för att se hur det ser ut när det är mer text."""
-                                ),
-                                dcc.Graph(id="id-fourth-graph")
-                            ]
-                        ),
-                    ),
-                    class_name="mb-3",
-                    md=6,
-                    sm=12,
-                ),
+                
+              
             ],
             class_name="g-3",
         ),
