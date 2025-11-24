@@ -17,6 +17,8 @@ To load and fixing the data
 # Summirizey statistics and visualizations about medals won by Team Australia in the Olympics
 df = load_olympics_data()
 df.loc[(df["ID"] == 118133) & (df["Year"] == 2012), "Medal"] = "Gold"
+df = df[df['Year'] != 1906]
+df = df[df['Sport'] != "Alpinism"]
 
 # Filter medals
 medals = df[df['Medal'].notna()]
@@ -99,7 +101,6 @@ fig = px.bar(
         'Australia': '#0D5257',
         'Andra länder': '#BBBCBC'
     },
-    title='Topp 15 OS-medaljör länder över tid i jämförelse med Australien',
     labels={
         'Cumulative_Medals': 'Totala Medaljer',
         'region': 'Länder',
@@ -181,7 +182,7 @@ ids = []
 
 total_games_os = total_summer_games + total_winter_games
 season_data = sunburst_df[sunburst_df['Season'] == season]
-total_medals_all = season_data['Count'].sum()
+total_medals_all = sunburst_df['Year'].nunique()
 
 
 # Root: Australia with total games participated
@@ -298,10 +299,10 @@ def layout():
         ),
         html.Div([
         html.H4("Medaljer", className="card-title"),
-        html.Span("-", id="gold_medals",className="gold dot"),
-        html.Span("-", id="silver_medals",className="silver dot"),
-        html.Span("-", id="bronze_medals",className="bronze dot"),
-        ],style={"margin-bottom": "20px", "text-align": "center"}),
+        html.Span("-", id="gold_medals", className="gold dot"),
+        html.Span("-", id="silver_medals", className="silver dot"),
+        html.Span("-", id="bronze_medals", className="bronze dot"),
+        ], style={"margin-bottom": "20px", "text-align": "center"}),
         dbc.Row(
             [   
                 dbc.Col(
@@ -361,7 +362,8 @@ def layout():
                                     className="card-title",
                                 ),
                                 html.H6("Antal sommar OS-medaljer", className="card-subtitle"),
-                                html.P("-", id="medals_in_each_summer", className="card-subtitle"),
+                                html.P("", className="card-subtitle"),
+                                html.P("-", id="medals_in_each_summer", className="card-subtitle", style={"font-weight": "italic", "font-size" : "1rem"}),
                             ]
                         ),
                     ),
@@ -379,7 +381,8 @@ def layout():
                                     className="card-title",
                                 ),
                                 html.H6("Antal vinter OS-medaljer", className="card-subtitle"),
-                                html.P("-", id="medals_in_each_winter", className="card-subtitle"),
+                                html.P("", className="card-subtitle"),
+                                html.P("-", id="medals_in_each_winter", className="card-subtitle", style={"font-weight": "italic", "font-size" : "1rem"}),
                             ]
                         ),
                     ),
@@ -397,7 +400,8 @@ def layout():
                                     className="card-title",
                                 ),
                                 html.H6("Antal athleter med OS-medaljer", className="card-subtitle"),
-                                html.P("-", id="medals_for_team_event", className="card-subtitle"),
+                                html.P("", className="card-subtitle"),
+                                html.P("-", id="medals_for_team_event", className="card-subtitle", style={"font-weight": "italic", "font-size" : "1rem"}), 
                             ]
                         ),
                     ),
@@ -409,12 +413,11 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4("Första grafen kommer här"),
-                                html.P("Text om graf."),
+                                html.H4("I vilka och hur många medaljer har Australien fått i OS som det har deltagit i? Är det någon skillnad mellan sommar- och vinter-OS?", className="card-title"),
+                                html.P("Grafen visar en hierarkisk vy av medaljer som Australien har fått i Olympiska spelen, uppdelat efter säsong, år, medaljtyp och sport."),
                                 dcc.Graph(
-                                id='animated-bar-chart',
-                                figure=fig,
-                                style={'height': '700px'}
+                                    id="sunburst_medals",
+                                    figure = sunburst_medals
                                 ),
                             ]
                         ),
@@ -426,11 +429,12 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4("Australiens OS-medaljer", className="card-title"),
-                                html.P("Sunburst: Säsong → År → Medalj → Sport"),
+                                html.H4("Hur många medaljer har Australien samlat på sig totalt genom åren och vilken ställning har de i top 15?"),
+                                html.P("Grafen illustrerar hur många medaljer alla länder fått i OS och vilken ställning just Australien har."),
                                 dcc.Graph(
-                                    id="sunburst_medals",
-                                    figure = sunburst_medals
+                                id='animated-bar-chart',
+                                figure=fig,
+                                style={'height': '700px'}
                                 ),
                             ]
                         ),
@@ -465,7 +469,7 @@ def update_summary_cards(_):
     aus_data = df[df['region'] == 'Australia']
     
     # Calculate number of Olympic Games Australia participated in
-    number_of_olympic_games = aus_data['Games'].nunique()
+    number_of_olympic_games = total_games_os
     
     # Calculate total medals won by Australia
     aus_medals = medals_filtered[medals_filtered['NOC'].isin(['AUS', 'ANZ'])]
@@ -501,6 +505,6 @@ def update_summary_cards(_):
     
     # Calculate how many team event medals
     team_event_medals = aus_medals[aus_medals['Event'].str.contains("Team", case=False, na=False)]
-    medals_for_team_event= f"{len(team_event_medals)} medaljer från lag-event"
+    medals_for_team_event= f"Antal vunnna lag-tävlingar {len(team_event_medals)} st"
 
     return number_of_olympic_games, Number_of_medals, total_athletes, gold_medals, silver_medals, bronze_medals, number_of_summer_medals, medals_in_each_summer, number_of_winter_medals, medals_in_each_winter, number_of_athlete_medals, medals_for_team_event
