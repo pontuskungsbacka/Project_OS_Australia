@@ -129,7 +129,7 @@ def layout():
     return [
         html.H3("Simning", className="mb-3"),
         html.P(
-           """En analys av simning i Olympiska spelen. Denna sida ger en sammanfattning av viktiga statistik och
+           """En analys av simning i Olympiska spelen. Denna sida ger en sammanfattning av viktig statistik och
         visualiseringar prestationer i simning under de Olympiska spelen.
         """
         ),
@@ -196,36 +196,6 @@ def layout():
                     ),
                     class_name="mb-3",
                     width=12,
-                ),
-                dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.H4("Tredje grafen kommer här"),
-                                html.P("Text om graf."),
-                                dcc.Graph(id="id-third-graph"),
-                            ]
-                        ),
-                    ),
-                    class_name="mb-3",
-                    md=6,
-                    sm=12,
-                ),
-                dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.H4("Fjärde grafen kommer här"),
-                                html.P(
-                                    """Text om graf. Längre text för att se hur det ser ut när det är mer text."""
-                                ),
-                                dcc.Graph(id="id-fourth-graph"),
-                            ]
-                        ),
-                    ),
-                    class_name="mb-3",
-                    md=6,
-                    sm=12,
                 ),
             ],
             class_name="g-3",
