@@ -2,7 +2,7 @@ import dash
 import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import Input, Output, callback, dcc, html
-import plotly_express as px 
+import plotly.express as px 
 from load_data import load_olympics_data
 
 df = load_olympics_data()
