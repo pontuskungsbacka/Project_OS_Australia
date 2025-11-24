@@ -244,12 +244,15 @@ def layout():
 def update_summary_cards_swim(_):
     
     # Calculate the first year Swimming was in the Olympics
-    first_swimming_game = swimming_medals['Year'].min()
-    
+    first_swimming_game_value = swimming_medals['Year'].min()
+    first_swimming_game = str(f"{first_swimming_game_value:.0f} år")
+
     # Calculate how many years Swimming has been in the Olympics
-    Number_of_years_swimming = swimming_medals['Year'].nunique()
+    Number_of_years_swimming_value = swimming_medals['Year'].nunique()
+    Number_of_years_swimming = str(f"{Number_of_years_swimming_value} år")
     
     # Calculate how many events it is in Swimming
-    total_events_swimming = swimming_medals['Event'].nunique()
+    total_events_swimming_value = swimming_medals['Event'].nunique()
+    total_events_swimming = str(f"{total_events_swimming_value} st")
     
     return first_swimming_game, Number_of_years_swimming, total_events_swimming
