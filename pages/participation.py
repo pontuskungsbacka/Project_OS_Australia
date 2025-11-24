@@ -7,9 +7,9 @@ from load_data import load_olympics_data
 
 TITLE = "Olympiska spelen Analys - Team Australien"
 OS_LOGO = "assets/olympic-logo.svg"
-PAGE_TITLE = "Översikt analys"
+PAGE_TITLE = "Deltagande"
 
-dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/", order=0)
+dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/participation", order=0)
 
 
 def layout():
@@ -39,7 +39,7 @@ def layout():
     )                   #Clearer curve. Shows growth instead of absolute counts.
 
     return [
-        html.H3("Översikt analys", className="mb-3"),
+        html.H3("Deltagande", className="mb-3"),
         html.P(
             """En översikt över Olympiska spelen med fokus på Team Australien. Denna sida ger en sammanfattning av
         viktiga statistik och visualiseringar relaterade till Australiens prestationer i de Olympiska spelen.
