@@ -166,4 +166,4 @@ def toggle_navbar_collapse(n, _, is_open):
     return is_open
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
