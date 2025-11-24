@@ -3,6 +3,52 @@
 ## Innehåll
 I project_OS_Australia så använder vi oss av ett OS dataset från kaggle och och presenterar intressant data via en dash funktion.
 
+## Repository layout
+```
+Project_OS_Australia/
+├─ data/
+│  ├─ athlete_events.csv
+│  ├─ athlete_events_fixed_age.csv
+│  ├─ australia_missing_AGE_FIX.csv
+│  └─ noc_regions.csv
+├─ assets /
+│  ├─ style.css                 
+│  ├─ favicon.ico            
+│  └─ img
+│      ├─ equ.svg 
+│      ├─ github-mark.svg                 
+│      ├─ hoc.svg     
+│      ├─ linkedin-logo.svg 
+│      ├─ olympic-logo.svg                 
+│      ├─ row.svg     
+│      ├─ swm.svg             
+│      └─ team-AUS-logo.svg
+├─ notebooks /
+│  ├─ 00_explore_data.ipynb
+│  ├─ Adam.ipynb               
+│  ├─ Julia.ipynb          
+│  ├─ Laura.ipynb
+│  ├─ Laura_clean.ipynb                 
+│  ├─ Pontus.ipynb           
+│  ├─ cleaner.py
+│  └─ swimming.ipynb
+├─ pages /
+│  ├─ about.py                
+│  ├─ age.py          
+│  ├─ equestrian.py
+│  ├─ gender.py
+│  ├─ hockey.py              
+│  ├─ medals.py        
+│  ├─ participation.py
+│  ├─ rowing.py
+│  └─ swimming.py
+├─  .gitignore      
+├─  README.md   
+├─  app.py    
+├─  load_data.py     
+└─  requirements.txt
+```
+
 ## Undersökning av data
 I mappen /notebooks finns jupyter filer från alla deltagande där vi undersökt datan och som legat till grund för intressant statistik som sedan presenteras i dash.
 
