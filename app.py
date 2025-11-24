@@ -86,7 +86,7 @@ navbar = dbc.Navbar(
                     "Olympiska spelen - Team Australien",
                 ],
                 href="/",
-                className="navbar-brand",
+                className="navbar-brand"
             ),
             dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
             dbc.Collapse(
