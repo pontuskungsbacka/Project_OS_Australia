@@ -287,7 +287,7 @@ sunburst_medals = go.Figure(go.Sunburst(
 ))
 sunburst_medals.update_layout(
     margin=dict(t=50, l=0, r=0, b=0),
-    height=800
+    height=650
 )
 
 def layout():
