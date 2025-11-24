@@ -203,7 +203,7 @@ for season in ['Summer', 'Winter']:
         labels.append(f'{season}<br>{participated}/{total_games} total olympic games<br> with medals<br>{int(total_medals)} medals')
         parents.append('australia')
         values.append(total_medals)
-        colors.append('#F0E13F' if season == 'Summer' else '#0E5959')
+        colors.append('#3B7F7F' if season == 'Summer' else '#0E5959')
         ids.append(season.lower())
 
 # Level 2: Year per Season (with medal count)
@@ -217,7 +217,7 @@ for season in ['Summer', 'Winter']:
             labels.append(f'{year}<br>{int(year_medals)} medals')
             parents.append(season.lower())
             values.append(year_medals)
-            colors.append('#EFE25F' if season == 'Summer' else '#3B7F7F')
+            colors.append('#7EB2B2' if season == 'Summer' else '#3B7F7F')
             ids.append(f'{season.lower()}_{year}')
 
 # Level 3: Medal Type per Year
