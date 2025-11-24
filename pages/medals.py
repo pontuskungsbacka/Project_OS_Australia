@@ -167,6 +167,7 @@ aus_summer_games = aus_participated_games[aus_participated_games['Season'] == 'S
 aus_winter_games = aus_participated_games[aus_participated_games['Season'] == 'Winter']['Year'].nunique()
 total_aus_games = aus_participated_games['Year'].nunique()
 
+
 # Total Olympic Games ever held (approximate from data)
 total_summer_games = df[(df['Season'] == 'Summer')]['Year'].nunique()
 total_winter_games = df[(df['Season'] == 'Winter')]['Year'].nunique()
@@ -178,10 +179,13 @@ values = []
 colors = []
 ids = []
 
-total_games_os = 28+22
+total_games_os = total_summer_games + total_winter_games
+season_data = sunburst_df[sunburst_df['Season'] == season]
+total_medals_all = season_data['Count'].sum()
+
 
 # Root: Australia with total games participated
-labels.append(f'Australien har fått medaljer i<br>{total_aus_games} olympiska spel av {total_games_os}')
+labels.append(f'Australia got medals in<br>{total_medals_all} Olympic Games out of {total_games_os}')
 parents.append('')
 values.append(sunburst_df['Count'].sum())
 colors.append('#FFFFFF')
@@ -195,7 +199,7 @@ for season in ['Summer', 'Winter']:
         participated = season_data['Year'].nunique()
         total_games = total_summer_games if season == 'Summer' else total_winter_games
         
-        labels.append(f'{season}<br>{participated}/{total_games} antal olympiska spel med medaljer<br>{int(total_medals)} medaljer')
+        labels.append(f'{season}<br>{participated}/{total_games} total olympic games with medals<br>{int(total_medals)} medals')
         parents.append('australia')
         values.append(total_medals)
         colors.append('#BBBCBC' if season == 'Summer' else '#0E5959')
@@ -209,7 +213,7 @@ for season in ['Summer', 'Winter']:
             year_data = season_data[season_data['Year'] == year]
             year_medals = year_data['Count'].sum()
             
-            labels.append(f'{year}<br>{int(year_medals)} Medaljer')
+            labels.append(f'{year}<br>{int(year_medals)} medals')
             parents.append(season.lower())
             values.append(year_medals)
             colors.append('#D9D9D6' if season == 'Summer' else '#3B7F7F')
@@ -276,49 +280,30 @@ sunburst_medals = go.Figure(go.Sunburst(
     values=values,
     marker=dict(colors=colors, line=dict(width=1, color='white')),
     textinfo='label',
-    hovertemplate='<b>%{label}</b><br>Medaljer: %{value}<extra></extra>',
-    branchvalues='total',
+    hovertemplate='<b>%{label}</b><extra></extra>',  # Remove %{value} from hover
+    branchvalues='total',  # This means parent values = sum of children
     maxdepth=3
 ))
 sunburst_medals.update_layout(
-    title='Australia Olympic Participation & Medals: Games → Year → Medal Type → Sport',
     margin=dict(t=50, l=0, r=0, b=0),
-    height=600
+    height=800
 )
 
 def layout():
     return [
-        html.H3("Medaljer analys", className="mb-3"),
+        html.H3("Medaljer", className="mb-3"),
         html.P(
-            """En analys av medaljer vunna av Team Australien i Olympiska spelen. Denna sida ger en sammanfattning av viktiga statistik och
-        visualiseringar relaterade till Australiens medaljprestationer i de Olympiska spelen.
+            """En analys över hur många medaljer Team Australia har fått genom tiderna och i vilken säsong det presterar bäst i. 
         """
         ),
+        html.Div([
+        html.H4("Medaljer", className="card-title"),
+        html.Span("-", id="gold_medals",className="gold dot"),
+        html.Span("-", id="silver_medals",className="silver dot"),
+        html.Span("-", id="bronze_medals",className="bronze dot"),
+        ],style={"margin-bottom": "20px", "text-align": "center"}),
         dbc.Row(
             [   
-                dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.Ul(
-                                    [
-                                        html.Li([
-                                            html.Span("Guld: ", id="gold_medals",className="gold"),
-                                        ], className="atom-list-li"),
-                                        html.Li([
-                                            html.Span("Silver: ", id="silver_medals",className="silver"),
-                                        ], className="atom-list-li"),
-                                        html.Li([
-                                            html.Span("Brons: ", id="bronze_medals",className="bronze"),
-                                        ], className="atom-list-li"),
-                                    ],className="atom-list-ul parent-list "
-                                )
-                            ]
-                        ),
-                    ),
-                    class_name="mb-3",
-                    width=12,
-                ),
                 dbc.Col(
                     dbc.Card(
                         dbc.CardBody(
@@ -370,6 +355,60 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
+                                html.H4(
+                                    "-",
+                                    id="number_of_summer_medals",
+                                    className="card-title",
+                                ),
+                                html.H6("Antal sommar OS-medaljer", className="card-subtitle"),
+                                html.P("-", id="medals_in_each_summer", className="card-subtitle"),
+                            ]
+                        ),
+                    ),
+                    class_name="mb-3",
+                    md=4,
+                    sm=12,
+                ),
+                dbc.Col(
+                    dbc.Card(
+                        dbc.CardBody(
+                            [
+                                html.H4(
+                                    "-",
+                                    id="number_of_winter_medals",
+                                    className="card-title",
+                                ),
+                                html.H6("Antal vinter OS-medaljer", className="card-subtitle"),
+                                html.P("-", id="medals_in_each_winter", className="card-subtitle"),
+                            ]
+                        ),
+                    ),
+                    class_name="mb-3",
+                    md=4,
+                    sm=12,
+                ),
+                dbc.Col(
+                    dbc.Card(
+                        dbc.CardBody(
+                            [
+                                html.H4(
+                                    "-",
+                                    id="number_of_athlete_medals",
+                                    className="card-title",
+                                ),
+                                html.H6("Antal athleter med OS-medaljer", className="card-subtitle"),
+                                html.P("-", id="medals_for_team_event", className="card-subtitle"),
+                            ]
+                        ),
+                    ),
+                    class_name="mb-3",
+                    md=4,
+                    sm=12,
+                ),
+                dbc.Col(
+                    dbc.Card(
+                        dbc.CardBody(
+                            [
                                 html.H4("Första grafen kommer här"),
                                 html.P("Text om graf."),
                                 dcc.Graph(
@@ -397,24 +436,7 @@ def layout():
                         ),
                     ),
                     class_name="mb-3",
-                    md=6,
-                    sm=12,
-                ),
-                dbc.Col(
-                    dbc.Card(
-                        dbc.CardBody(
-                            [
-                                html.H4("Fjärde grafen kommer här"),
-                                html.P(
-                                    """Text om graf. Längre text för att se hur det ser ut när det är mer text."""
-                                ),
-                                dcc.Graph(id="id-fourth-graph"),
-                            ]
-                        ),
-                    ),
-                    class_name="mb-3",
-                    md=6,
-                    sm=12,
+                    width=12,
                 ),
             ],
             class_name="g-3",
@@ -425,7 +447,16 @@ def layout():
     [
         Output("number_of_olympic_games", "children"),
         Output("Number_of_medals", "children"),
-        Output("total_athletes", "children")
+        Output("total_athletes", "children"),
+        Output("gold_medals", "children"),
+        Output("silver_medals", "children"),
+        Output("bronze_medals", "children"),
+        Output("number_of_summer_medals", "children"),
+        Output("medals_in_each_summer", "children"),
+        Output("number_of_winter_medals", "children"),
+        Output("medals_in_each_winter", "children"),
+        Output("number_of_athlete_medals", "children"),
+        Output("medals_for_team_event", "children"),
     ],
     Input("number_of_olympic_games", "children"),  # Trigger on page load
 )
@@ -443,4 +474,33 @@ def update_summary_cards(_):
     # Calculate total unique athletes
     total_athletes = aus_data['ID'].nunique()
     
-    return number_of_olympic_games, Number_of_medals, total_athletes
+    # Calculate total gold, silver, and bronze medals for Australia
+    gold_medals = len(aus_medals[aus_medals['Medal'] == 'Gold'])
+    silver_medals = len(aus_medals[aus_medals['Medal'] == 'Silver'])
+    bronze_medals = len(aus_medals[aus_medals['Medal'] == 'Bronze'])
+    
+    # Calculate number of summer and winter games with medals
+    summer_medals = aus_medals[aus_medals['Season'] == 'Summer']
+    winter_medals = aus_medals[aus_medals['Season'] == 'Winter']
+    
+    number_of_summer_medals = len(summer_medals)
+    number_of_winter_medals = len(winter_medals)
+    
+    # Calculate games participated vs medals won for summer
+    summer_games_with_medals = summer_medals['Year'].nunique()
+    summer_games_participated = aus_data[aus_data['Season'] == 'Summer']['Year'].nunique()
+    medals_in_each_summer = f"{summer_games_with_medals}/{summer_games_participated} antal olympiska spel med medaljer"
+    
+    # Calculate games participated vs medals won for winter
+    winter_games_with_medals = winter_medals['Year'].nunique()
+    winter_games_participated = aus_data[aus_data['Season'] == 'Winter']['Year'].nunique()
+    medals_in_each_winter = f"{winter_games_with_medals}/{winter_games_participated} antal olympiska spel med medaljer"
+    
+    # Calculate unique athletes with medals
+    number_of_athlete_medals = aus_medals['ID'].nunique()
+    
+    # Calculate how many team event medals
+    team_event_medals = aus_medals[aus_medals['Event'].str.contains("Team", case=False, na=False)]
+    medals_for_team_event= f"{len(team_event_medals)} medaljer från lag-event"
+
+    return number_of_olympic_games, Number_of_medals, total_athletes, gold_medals, silver_medals, bronze_medals, number_of_summer_medals, medals_in_each_summer, number_of_winter_medals, medals_in_each_winter, number_of_athlete_medals, medals_for_team_event
