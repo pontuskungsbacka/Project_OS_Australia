@@ -13,6 +13,7 @@ PAGE_TITLE = "Åldersanalys"
 
 dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/age", order=2)
 
+australia_rows = df[(df['NOC'] == 'AUS') | (df['NOC'] == 'ANZ') ]
 
 def layout():
     australia_rows = df[(df['NOC'] == 'AUS') | (df['NOC'] == 'ANZ')]
@@ -38,8 +39,8 @@ def layout():
                         dbc.CardBody(
                             [
                                 html.H4(
-                                    "13 år",
-                                    id="youngest-athlete",
+                                    "-",
+                                    id="youngest_athlete",
                                     className="card-title",
                                 ),
                                 html.H6("Yngsta deltagarna. Detta var idrottare i simning och rodd under 60- och 70-talet.", className="card-subtitle"),
@@ -55,8 +56,8 @@ def layout():
                         dbc.CardBody(
                             [
                                 html.H4(
-                                    "25 år",
-                                    id="average-athlete",
+                                    "-",
+                                    id="average_athlete",
                                     className="card-title",
                                 ),
                                 html.H6("Genomsnittlig ålder", className="card-subtitle"),
@@ -71,7 +72,11 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4("62 år", id="oldest-athlete", className="card-title"),
+                                html.H4(
+                                    "-", 
+                                    id="oldest_athlete", 
+                                    className="card-title"
+                                    ),
                                 html.H6("Den äldsta deltagaren från Australien tävlade i konst år 1932.", className="card-subtitle"),
                             ]
                         ),
@@ -99,3 +104,28 @@ def layout():
             class_name="g-3",
         ),
     ]
+
+@callback(
+    [
+        Output("youngest_athlete", "children"),
+        Output("average_athlete", "children"),
+        Output("oldest_athlete", "children")
+    ],
+    Input("youngest_athlete", "children"),  # Trigger on page load
+)
+
+def update_summary_cards_age(_):
+    
+    # Calculate the youngst australian participant
+    youngest_athlete_value = australia_rows['Age'].min()
+    youngest_athlete = f"{youngest_athlete_value:.0f} år"
+
+    # Calculate the age of the average australian participant
+    average_athlete_value = australia_rows['Age'].mean()
+    average_athlete = f"{average_athlete_value:.0f} år"
+    
+    # Calculate the age of the oldest australian participant
+    oldest_athlete_value = australia_rows["Age"].max()
+    oldest_athlete = f"{oldest_athlete_value:.0f} år"
+    
+    return youngest_athlete, average_athlete, oldest_athlete
