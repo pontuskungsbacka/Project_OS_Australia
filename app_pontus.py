@@ -7,6 +7,7 @@ import pandas as pd
 
 TITLE = "Olympiska spelen Analys - Team Australien"
 OS_LOGO = "assets/img/olympic-logo.svg"
+AUS_LOGO = "assets/img/team-AUS-logo.svg"
 
 
 app = Dash(title=TITLE, external_stylesheets=[dbc.icons.BOOTSTRAP], use_pages=True, suppress_callback_exceptions=True)
@@ -65,8 +66,9 @@ SIDEBAR_STYLE = {
 sidebar = html.Div(
     [
         html.Img(src=OS_LOGO, width=60),
+        html.Img(src=AUS_LOGO, width=60),
         html.Hr(),
-        html.P("Olympiska spelen Analys - Team Australien", className="lead"),
+        html.P("Olympiska spelen - Team Australien", className="lead"),
         dbc.Nav([], vertical=True, pills=True, id="sidebar-nav"),
     ],
     style=SIDEBAR_STYLE,
@@ -80,7 +82,8 @@ navbar = dbc.Navbar(
             dcc.Link(
                 [
                     html.Img(src=OS_LOGO, width=30, height=30, className="d-inline-block align-top mr-2"),
-                    "Olympiska spelen Analys - Team Australien",
+                    html.Img(src=AUS_LOGO, width=30, height=30, className="d-inline-block align-top mr-2"),
+                    "Olympiska spelen - Team Australien",
                 ],
                 href="/",
                 className="navbar-brand",
