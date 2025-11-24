@@ -11,7 +11,6 @@ PAGE_TITLE = "Ridning"
 
 dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/equestrian", order=7)
 
-
 def prepare_equestrianism_data(selected_medal="ALL"):
     """Förbereder equestrian-data"""
     df = load_olympics_data()
@@ -22,25 +21,29 @@ def prepare_equestrianism_data(selected_medal="ALL"):
                             .size()
                             .reset_index(name="Count"))
 
+    # Separate columns per medal type
     medals_all_years = medals_sorted_per_year.pivot_table(
         values="Count",
         index=["Year", "NOC"],
         columns="Medal",
         fill_value=0
     ).reset_index()
-
+ 
     medals_all_years.columns.name = None
+
     medals_all_years["Total"] = (
         medals_all_years["Gold"]
         + medals_all_years["Silver"]
         + medals_all_years["Bronze"]
     )
     medals_all_years["Year"] = medals_all_years["Year"].astype(int)
-
-
-
+ 
+    medals_all_sorted = medals_all_years.sort_values(
+        ["Year", "Total"],
+        ascending=[True, False]
+    )
     ##########top10_per_year = medals_all_sorted.groupby("Year").head(10)
-
+ 
     # convert from wide to long format
     sorted_medals_melt = pd.melt(
         medals_all_years,
@@ -49,26 +52,32 @@ def prepare_equestrianism_data(selected_medal="ALL"):
         var_name="Medaltype",
         value_name="Amount"
     )
-    
+   
     if selected_medal != "ALL":
         sorted_medals_melt = sorted_medals_melt[sorted_medals_melt["Medaltype"] == selected_medal]
-    
+   
     return sorted_medals_melt
 
-
 def layout():
+
+    ##########top10_per_year = medals_all_sorted.groupby("Year").head(10)
+
     sorted_medals_melt = prepare_equestrianism_data()
+
 
     fig_medals_equestrian = px.bar(
         sorted_medals_melt,
-        x="NOC",
+        x= "NOC",
         y="Amount",
-        color="Medaltype",
-        color_discrete_map={"Gold":"#9F8F5E", "Silver": "#969696", "Bronze": "#996B4F"},
-        title="Medals per country - Equestrianism",
-        labels={"Amount":"Medals total", "NOC":"Region", "Medaltype":"Medals type"},
-        barmode="group",
-        hover_data=["Year", "Medaltype"]
+        color= "Medaltype",
+        color_discrete_map={
+            "Gold":"#9F8F5E",
+            "Silver": "#969696",
+            "Bronze": "#996B4F"
+            },
+        title="Medals per conutry,  Equestranism",
+        labels={"value": "Medals total", "NOC":"Region", "Medaltype":"Medals type"},
+        barmode="group"
     )
     # kod nedan utvecklad med hjälp av Claude (Anthropic, 2025). Konversation: 16 november 2025:
     #frågan var hur jag kunde få tydligare graf.
@@ -82,8 +91,8 @@ def layout():
     fig_medals_equestrian.update_traces(
         hovertemplate="<b>%{x}</b><br>Medalj: %{customdata[1]}<br>År: %{customdata[0]}<br>Antal: %{y}<extra></extra>"
     )
-# allt mellan <b> och </b> visas med fetstil    #%{x} variabel för x-värdet #radbrytning
-    return [# visar att ett värde ska hämtas från datan.
+
+    return [
         html.H3("Ridning", className="mb-3"),
         html.P(
             """En analys av ridning i Olympiska spelen. Denna sida ger en sammanfattning av viktiga statistik och
@@ -97,11 +106,12 @@ def layout():
                         dbc.CardBody(
                             [
                                 html.H4(
-                                    "",
+                                    "summan av år",
                                     id="first-equestrian-game",
                                     className="card-title",
                                 ),
-                                html.H6("Första Ridningsgren i Olympiska spelen", className="card-subtitle"),
+                                html.H6("Antal år i OS" \
+                                "", className="card-subtitle"),
                             ]
                         ),
                     ),
@@ -130,20 +140,12 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4("Filtrera på medalj", className="card-title"),
-                                dbc.Label("Välj medaljtyp"),
-                                dcc.Dropdown(
-                                    id="Medal-filter",
-                                    options=[
-                                        {"label": "Alla medaljer", "value": "ALL"},
-                                        {"label": "Guld", "value": "Gold"},
-                                        {"label": "Silver", "value": "Silver"},
-                                        {"label": "Brons", "value": "Bronze"},
-                                    ],
-                                    value="ALL",
-                                    clearable=False
+                                html.H4(
+                                    "-",
+                                    id="Number-of-years-equestrian",
+                                    className="card-title",
                                 ),
-                                html.H6("Antal evenemang", className="card-subtitle"),
+                                html.H6("Antal år", className="card-subtitle"),
                             ]
                         ),
                     ),
@@ -155,38 +157,51 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4("Medaljer i ridning per land"),
-                                html.P("Text om graf."),
-                                dcc.Graph(id="id-first-graph", figure=fig_medals_equestrian),
+                                html.H6("Antal evenemang", className="card-subtitle"),
+                                html.H4("Medaljfördelning i OS"),
+                                html.P("Medaljer fördelat på land historiskt. Sortera på önskad medaljtyp nedan."),
+                                html.H4("", className="card-title"),
+                                dbc.Label("Välj"),
+                                    dcc.Dropdown(
+                                        id="Medal_filter",
+                                        options=[
+                                            {"label": "Alla medaljer", "value": "ALL"},
+                                            {"label": "Guld", "value": "Gold"},
+                                            {"label": "Silver", "value": "Silver"},
+                                            {"label": "Brons", "value": "Bronze"},
+                                            ],
+                                        value= "ALL",
+                                        clearable= False
+                                    ),
+                                dcc.Graph(id="id_first_graph", figure= fig_medals_equestrian),
                             ]
                         ),
                     ),
                     class_name="mb-3",
-                    md=12,
-                    sm=12,
+                    width=12,
                 ),
+                
+                
             ],
             class_name="g-3",
         ),
     ]
-
-
 @callback(
-    Output("id-first-graph", "figure"),
-    Input("Medal-filter", "value")
+    Output("id_first_graph", "figure"),
+    Input("Medal_filter", "value")
 )
-
+ 
 def update_medal_figure(selected_medal):
     sorted_medals_melt = prepare_equestrianism_data(selected_medal)
-
+ 
     updated_fig = px.bar(
         sorted_medals_melt,
         x="NOC",
         y="Amount",
         color="Medaltype",
-        color_discrete_map= {"Gold": "#9F8F5E", "Silver": "#969696", "Bronze": "#996B4F"},
-        title= "Medals per country - Equestrianism",
-        barmode= "group",
+        color_discrete_map={"Gold": "#9F8F5E", "Silver": "#969696", "Bronze": "#996B4F"},
+        title="Medals per country - Equestrianism",
+        barmode="group",
         hover_data=["Year", "Medaltype"]
     )
     updated_fig.update_layout(
@@ -197,5 +212,5 @@ def update_medal_figure(selected_medal):
     updated_fig.update_traces(
         hovertemplate="<b>%{x}</b><br>Medalj: %{customdata[1]}<br>År: %{customdata[0]}<br>Antal: %{y}<extra></extra>"
     )
-
+ 
     return updated_fig
