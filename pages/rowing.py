@@ -23,7 +23,8 @@ def layout():
     fig_hist2 = px.histogram(
         rowing_rows_uniqueID, 
         x='Age', 
-        nbins=50
+        nbins=50,
+        color_discrete_sequence=["#0D5257"]
     )
 
     #correlation plot
@@ -142,3 +143,4 @@ def layout():
             class_name="g-3",
         ),
     ]
+    

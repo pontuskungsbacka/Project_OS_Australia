@@ -22,7 +22,8 @@ def layout():
     fig_hist1 = px.histogram(   
         australia_rows_uniqueID, 
         x='Age', 
-        nbins=50
+        nbins=50,
+        color_discrete_sequence=["#0D5257"],
     )
 
     return [
