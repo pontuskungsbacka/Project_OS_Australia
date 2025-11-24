@@ -17,7 +17,7 @@ NAVBAR = {
     "Team Australia": {
         "Medaljer": {"icon": "bi bi-award", "relative_path": "/", "class": "nav-item-team"},
         "Deltagande": {"icon": "bi bi-clipboard-data", "relative_path": "/participation", "class": "nav-item-team"},
-        "Ålderar": {"icon": "bi bi-person-vcard", "relative_path": "/age", "class": "nav-item-team"},
+        "Åldrar": {"icon": "bi bi-person-vcard", "relative_path": "/age", "class": "nav-item-team"},
         "Genus": {"icon": "bi bi-gender-ambiguous", "relative_path": "/gender", "class": "nav-item-team"},
     },
     "OS Sport Analys": {
