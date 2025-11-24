@@ -34,6 +34,7 @@ fig_gender_bar = px.bar(
     compare_reset, x="Year", y=["Globalt", "Australien"],
     barmode="group",
     facet_row="Season",
+    color_discrete_map={"Australien":"#C4D600", "Globalt": "#BBBCBC"},
     labels={
         "value": "Andel kvinnor %",
         "variable": "Kategori",
@@ -47,6 +48,7 @@ fig_gender_bar = px.bar(
 fig_gender_line = px.line(
     compare_reset, x="Year", y=["Globalt", "Australien"],
     facet_row="Season",
+    color_discrete_map={"Australien":"#C4D600", "Globalt": "#BBBCBC"},
     labels={
         "value": "Andel kvinnor %",
         "variable": "Kategori",
