@@ -344,7 +344,7 @@ def layout():
                         dbc.CardBody(
                             [
                                 html.H4("-", id="total_athletes", className="card-title"),
-                                html.H6("Totalt althleter", className="card-subtitle"),
+                                html.H6("Totalt atleter", className="card-subtitle"),
                             ]
                         ),
                     ),
@@ -399,7 +399,7 @@ def layout():
                                     id="number_of_athlete_medals",
                                     className="card-title",
                                 ),
-                                html.H6("Antal athleter med OS-medaljer", className="card-subtitle"),
+                                html.H6("Antal atleter med OS-medaljer", className="card-subtitle"),
                                 html.P("", className="card-subtitle"),
                                 html.P("-", id="medals_for_team_event", className="card-subtitle", style={"font-weight": "italic", "font-size" : "1rem"}), 
                             ]
