@@ -160,8 +160,8 @@ def update_gender_graph(chart_type):
     best_row = compare_reset.loc[compare_reset["Australien"].idxmax()]
     worst_row = compare_reset.loc[compare_reset["Australien"].idxmin()]
     
-    max_percentage_aus = f"{int(best_row["Year"])} - {best_row["Australien"]:.1f}%"
-    min_percentage_aus = f"{int(worst_row["Year"])} - {worst_row["Australien"]:.1f}%"
+    max_percentage_aus = f"{int(best_row['Year'])} - {best_row['Australien']:.1f}%"
+    min_percentage_aus = f"{int(worst_row['Year'])} - {worst_row['Australien']:.1f}%"
     return fig, str(first_woman_aus), max_percentage_aus, min_percentage_aus
 
 
