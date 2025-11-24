@@ -214,3 +214,27 @@ def update_medal_figure(selected_medal):
     )
  
     return updated_fig
+ 
+def update_medal_figure(selected_medal):
+    sorted_medals_melt = prepare_equestrianism_data(selected_medal)
+ 
+    updated_fig = px.bar(
+        sorted_medals_melt,
+        x="NOC",
+        y="Amount",
+        color="Medaltype",
+        color_discrete_map={"Gold": "#9F8F5E", "Silver": "#969696", "Bronze": "#996B4F"},
+        title="Medals per country - Equestrianism",
+        barmode="group",
+        hover_data=["Year", "Medaltype"]
+    )
+    updated_fig.update_layout(
+        xaxis_tickangle=-45,
+        height=600,
+        xaxis={'categoryorder': 'total descending'}
+    )
+    updated_fig.update_traces(
+        hovertemplate="<b>%{x}</b><br>Medalj: %{customdata[1]}<br>År: %{customdata[0]}<br>Antal: %{y}<extra></extra>"
+    )
+ 
+    return updated_fig

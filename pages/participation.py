@@ -28,6 +28,7 @@ def layout():
         participation_historical_aus,
         x= "Year", 
         y= "Participants",
+        color_discrete_map={"Summer":"#efdf00", "Winter":"#52D5f2"},
         color="Season",
         markers=True,
         title= "Australia participation 1896–2016"
@@ -105,7 +106,7 @@ def layout():
                         ),
                     ),
                     class_name="mb-3",
-                    md=6,
+                    md=12,
                     sm=12,
                 ),
                 
