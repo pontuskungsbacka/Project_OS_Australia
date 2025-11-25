@@ -18,14 +18,17 @@ df = remove_team_duplicated_medals(df, "Equestrianism")
 sport_equestrianism = df[df["Sport"] == "Equestrianism"]  
 
 
-def prepare_equestrianism_data(selected_medal="ALL"):
+def prepare_equestrianism_data(selected_medal="ALL", selected_years=None):
     """Förbereder equestrian-data"""
     sport_equestrianism_medals = sport_equestrianism[sport_equestrianism["Medal"].notna()]
+    
+    if selected_years:
+        sport_equestrianism_medals = sport_equestrianism_medals[sport_equestrianism_medals["Year"].isin(selected_years)]
+    
     medals_sorted_per_year = (sport_equestrianism_medals.groupby(["Year", "NOC", "Medal"])
                             .size()
                             .reset_index(name="Count"))
 
-    # Separate columns per medal type
     medals_all_years = medals_sorted_per_year.pivot_table(
         values="Count",
         index=["Year", "NOC"],
@@ -53,12 +56,12 @@ def prepare_equestrianism_data(selected_medal="ALL"):
         var_name="Medaltype",
         value_name="Amount"
     )
-   
+
     if selected_medal != "ALL":
         sorted_medals_melt = sorted_medals_melt[sorted_medals_melt["Medaltype"] == selected_medal]
    
     return sorted_medals_melt
-
+years_sorted = sorted(sport_equestrianism["Year"].dropna().unique().astype(int))
 first_year = np.min(sport_equestrianism["Year"].unique())
 mean_age = np.mean(sport_equestrianism["Age"].dropna())
 gender_counts = sport_equestrianism["Sex"].value_counts()
@@ -81,7 +84,7 @@ def layout():
             "Bronze": "#996B4F"
             },
         labels={"value": "Medals total", "NOC":"Region", "Medaltype":"Medals type"},
-        barmode="group"
+        barmode="stack"
     )
     # kod nedan utvecklad med hjälp av Claude (Anthropic, 2025). Konversation: 16 november 2025:
     #frågan var hur jag kunde få tydligare graf.
@@ -173,7 +176,15 @@ def layout():
                                         value= "ALL",
                                         clearable= False
                                     ),
-                                dcc.Graph(id="id_first_graph", figure= fig_medals_equestrian),
+                                    dcc.Dropdown(
+                                        id="Year_filter",
+                                        options=[{"label": str(year), "value": int(year)} for year in years_sorted],
+                                        value=[],
+                                        placeholder="Välj år",
+                                        multi=True,
+                                        clearable=True,
+                                    ),
+                                dcc.Graph(id="id_first_graph", figure=fig_medals_equestrian),
                             ]
                         ),
                     ),
@@ -188,11 +199,13 @@ def layout():
     ]
 @callback(
     Output("id_first_graph", "figure"),
-    Input("Medal_filter", "value")
+    Input("Medal_filter", "value"),
+    Input("Year_filter", "value"),
 )
  
-def update_medal_figure(selected_medal):
-    sorted_medals_melt = prepare_equestrianism_data(selected_medal)
+def update_medal_figure(selected_medal, selected_years):
+    sorted_medals_melt = prepare_equestrianism_data(selected_medal=selected_medal,
+                                                     selected_years=selected_years)
  
     updated_fig = px.bar(
         sorted_medals_melt,
@@ -200,7 +213,7 @@ def update_medal_figure(selected_medal):
         y="Amount",
         color="Medaltype",
         color_discrete_map={"Gold": "#9F8F5E", "Silver": "#969696", "Bronze": "#996B4F"},
-        barmode="group",
+        barmode="stack",
         hover_data=["Year", "Medaltype"]
     )
     updated_fig.update_layout(
@@ -214,26 +227,3 @@ def update_medal_figure(selected_medal):
  
     return updated_fig
  
-def update_medal_figure(selected_medal):
-    sorted_medals_melt = prepare_equestrianism_data(selected_medal)
- 
-    updated_fig = px.bar(
-        sorted_medals_melt,
-        x="NOC",
-        y="Amount",
-        color="Medaltype",
-        color_discrete_map={"Gold": "#9F8F5E", "Silver": "#969696", "Bronze": "#996B4F"},
-        title="Medals per country - Equestrianism",
-        barmode="group",
-        hover_data=["Year", "Medaltype"]
-    )
-    updated_fig.update_layout(
-        xaxis_tickangle=-45,
-        height=600,
-        xaxis={'categoryorder': 'total descending'}
-    )
-    updated_fig.update_traces(
-        hovertemplate="<b>%{x}</b><br>Medalj: %{customdata[1]}<br>År: %{customdata[0]}<br>Antal: %{y}<extra></extra>"
-    )
- 
-    return updated_fig
