@@ -341,10 +341,11 @@ aus_summer_games = aus_participated_games[aus_participated_games['Season'] == 'S
 aus_winter_games = aus_participated_games[aus_participated_games['Season'] == 'Winter']['Year'].nunique()
 total_aus_games = aus_participated_games['Year'].nunique()
 
+df_AUS = df[df["NOC"].isin(["AUS", "ANZ"])]
 
 # Total Olympic Games ever held (approximate from data)
-total_summer_games = df[(df['Season'] == 'Summer')]['Year'].nunique()
-total_winter_games = df[(df['Season'] == 'Winter')]['Year'].nunique()
+total_summer_games = df_AUS[(df_AUS['Season'] == 'Summer')]['Year'].nunique()
+total_winter_games = df_AUS[(df_AUS['Season'] == 'Winter')]['Year'].nunique()
 
 # Build hierarchical data
 labels = []
@@ -674,6 +675,6 @@ def update_summary_cards(_):
     
     # Calculate how many team event medals
     team_event_medals = aus_medals[aus_medals['Event'].str.contains("Team", case=False, na=False)]
-    medals_for_team_event= f"Antal vunnna lag-tävlingar {len(team_event_medals)} st"
+    medals_for_team_event= f"Antal vunna lag-tävlingar {len(team_event_medals)} st"
 
     return number_of_olympic_games, Number_of_medals, total_athletes, gold_medals, silver_medals, bronze_medals, number_of_summer_medals, medals_in_each_summer, number_of_winter_medals, medals_in_each_winter, number_of_athlete_medals, medals_for_team_event
