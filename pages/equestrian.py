@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import Input, Output, callback, dcc, html
 from load_data import load_olympics_data, remove_team_duplicated_medals
+import numpy as np
 
 TITLE = "Olympiska spelen Analys - Team Australien"
 OS_LOGO = "assets/olympic-logo.svg"
@@ -11,11 +12,14 @@ PAGE_TITLE = "Ridning"
 
 dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/equestrian", order=7)
 
+
+df = load_olympics_data()
+df = remove_team_duplicated_medals(df, "Equestrianism")
+sport_equestrianism = df[df["Sport"] == "Equestrianism"]  
+
+
 def prepare_equestrianism_data(selected_medal="ALL"):
     """Förbereder equestrian-data"""
-    df = load_olympics_data()
-    df = remove_team_duplicated_medals(df, "Equestrianism")
-    sport_equestrianism = df[df["Sport"] == "Equestrianism"]  
     sport_equestrianism_medals = sport_equestrianism[sport_equestrianism["Medal"].notna()]
     medals_sorted_per_year = (sport_equestrianism_medals.groupby(["Year", "NOC", "Medal"])
                             .size()
@@ -38,10 +42,7 @@ def prepare_equestrianism_data(selected_medal="ALL"):
     )
     medals_all_years["Year"] = medals_all_years["Year"].astype(int)
  
-    medals_all_sorted = medals_all_years.sort_values(
-        ["Year", "Total"],
-        ascending=[True, False]
-    )
+
     ##########top10_per_year = medals_all_sorted.groupby("Year").head(10)
  
     # convert from wide to long format
@@ -57,6 +58,10 @@ def prepare_equestrianism_data(selected_medal="ALL"):
         sorted_medals_melt = sorted_medals_melt[sorted_medals_melt["Medaltype"] == selected_medal]
    
     return sorted_medals_melt
+
+first_year = np.min(sport_equestrianism["Year"].unique())
+mean_age = np.mean(sport_equestrianism["Age"].dropna())
+gender_counts = sport_equestrianism["Sex"].value_counts()
 
 def layout():
 
@@ -75,7 +80,6 @@ def layout():
             "Silver": "#969696",
             "Bronze": "#996B4F"
             },
-        title="Medals per conutry,  Equestranism",
         labels={"value": "Medals total", "NOC":"Region", "Medaltype":"Medals type"},
         barmode="group"
     )
@@ -95,7 +99,7 @@ def layout():
     return [
         html.H3("Ridning", className="mb-3"),
         html.P(
-            """En analys av ridning i Olympiska spelen. Denna sida ger en sammanfattning av viktiga statistik och
+            """En analys av ridning i Olympiska spelen. Denna sida ger en sammanfattning av viktig statistik och
         visualiseringar prestationer i ridning under de Olympiska spelen.
         """
         ),
@@ -104,14 +108,15 @@ def layout():
                 dbc.Col(
                     dbc.Card(
                         dbc.CardBody(
-                            [
-                                html.H4(
-                                    "summan av år",
-                                    id="first-equestrian-game",
-                                    className="card-title",
-                                ),
-                                html.H6("Antal år i OS" \
-                                "", className="card-subtitle"),
+                            [ 
+                               html.H4(
+                                   str(f"{first_year:.0f}"),
+                                   className="card-title",
+                               ),
+                               html.H6(
+                                   "Första året i OS",
+                                   className="card-subtitle",
+                               ),
                             ]
                         ),
                     ),
@@ -123,12 +128,10 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4(
-                                    "-",
-                                    id="Number-of-years-equestrian",
+                                html.H4(str(f"{mean_age:.1f}"),
                                     className="card-title",
                                 ),
-                                html.H6("Antal år", className="card-subtitle"),
+                                html.H6("medelålder", className="card-subtitle"),
                             ]
                         ),
                     ),
@@ -140,12 +143,10 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4(
-                                    "-",
-                                    id="Number-of-years-equestrian",
+                                html.H4(str(f"Kvinnor: {gender_counts.get('F', 0)} | Män: {gender_counts.get('M', 0)}"),
                                     className="card-title",
                                 ),
-                                html.H6("Antal år", className="card-subtitle"),
+                                html.H6("Könsfördelning", className="card-subtitle"),
                             ]
                         ),
                     ),
@@ -157,8 +158,7 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H6("Antal evenemang", className="card-subtitle"),
-                                html.H4("Medaljfördelning i OS"),
+                                html.H4("Medaljfördelning för ridsport i OS"),
                                 html.P("Medaljer fördelat på land historiskt. Sortera på önskad medaljtyp nedan."),
                                 html.H4("", className="card-title"),
                                 dbc.Label("Välj"),
@@ -200,7 +200,6 @@ def update_medal_figure(selected_medal):
         y="Amount",
         color="Medaltype",
         color_discrete_map={"Gold": "#9F8F5E", "Silver": "#969696", "Bronze": "#996B4F"},
-        title="Medals per country - Equestrianism",
         barmode="group",
         hover_data=["Year", "Medaltype"]
     )
