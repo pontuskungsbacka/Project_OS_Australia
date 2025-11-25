@@ -471,7 +471,6 @@ def layout():
         """
         ),
         html.Div([
-        html.H4("Medaljer", className="card-title"),
         html.Span("-", id="gold_medals", className="gold dot"),
         html.Span("-", id="silver_medals", className="silver dot"),
         html.Span("-", id="bronze_medals", className="bronze dot"),
@@ -599,7 +598,7 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4("Hur många medaljer har Australien samlat på sig totalt genom åren och vilken ställning har de i top 15?"),
+                                html.H4("Hur många medaljer har Australien fått kontra övriga top 10 länder i de olympiska spelen, genom åren?"),
                                 html.P("Grafen illustrerar hur många medaljer alla länder fått i OS och vilken ställning just Australien har."),
                                 dcc.Graph(
                                 id='animated-bar-chart',
