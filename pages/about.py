@@ -178,6 +178,15 @@ def layout():
                                         ".",
                                     ]
                                 ),
+                            
+                                html.H5("Dashboard layout"),
+                                html.P(
+                                    [
+                                        "Denna dashboard har fått sina grunder från detta dashboard - michelin-guide-restaurants-dashboard. Dashboard grundmallen är skapat av Niek van Leeuwen och kan hittas här: ",
+                                        html.A("Github", href="https://github.com/niekvleeuwen/michelin-guide-restaurants-dashboard"),
+                                        ".",
+                                    ]
+                                ),
                             ]
                         ),
                     ),
