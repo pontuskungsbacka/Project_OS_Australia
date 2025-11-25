@@ -43,7 +43,7 @@ h1, h2, h3, h4, h5, h6 {
 .nav-link:hover .swm-logo,
 .nav-link:hover .row-logo,
 .nav-link:hover .equ-logo,
-.nav-link:hover .team-australia-logo, .link-icon {
+.nav-link:hover .team-australia-logo {
     background-color: #C4D600; /* hover fill color */
 }
 /* Content default style */
