@@ -58,69 +58,242 @@ medal_counts_withsports.columns.name = None
 
 medal_counts_withsports.head()
 
-# Get top 15 + Australia
-def get_top15_with_australia(year_data):
+# Get all Olympic years
+olympic_years = sorted(medal_counts_per_year['Year'].unique())
+
+# Create frames for each year
+frames = []
+for selected_year in olympic_years:
+    # Get data for that year
+    year_data = medal_counts_per_year[medal_counts_per_year['Year'] == selected_year].copy()
     year_data = year_data.sort_values('Cumulative_Medals', ascending=False).reset_index(drop=True)
     year_data['Rank'] = range(1, len(year_data) + 1)
-    top15 = year_data.head(15).copy()
     
-    if 'Australia' not in top15['region'].values:
-        aus_row = year_data[year_data['region'] == 'Australia']
-        if not aus_row.empty:
-            result = pd.concat([top15, aus_row])
-        else:
-            result = top15
-    else:
-        result = top15
+    # Get top 10
+    top10 = year_data.head(10).copy()
     
-    return result
+    # Get medal type counts for top 10
+    top10_with_medals = []
+    for _, country_row in top10.iterrows():
+        country = country_row['region']
+        country_medals = medals_filtered[
+            (medals_filtered['region'] == country) & 
+            (medals_filtered['Year'] <= selected_year)
+        ]
+        
+        medal_counts = country_medals.groupby('Medal').size().to_dict()
+        
+        top10_with_medals.append({
+            'region': country,
+            'Rank': country_row['Rank'],
+            'Total': country_row['Cumulative_Medals'],
+            'Gold': medal_counts.get('Gold', 0),
+            'Silver': medal_counts.get('Silver', 0),
+            'Bronze': medal_counts.get('Bronze', 0)
+        })
+    
+    top10_df = pd.DataFrame(top10_with_medals)
+    top10_df = top10_df.sort_values('Total', ascending=True)
+    
+    # Get Australia's rank for this year
+    australia_rank = year_data[year_data['region'] == 'Australia']['Rank'].values
+    aus_rank = int(australia_rank[0]) if len(australia_rank) > 0 else None
+    
+    # Create frame data
+    frame_data = []
+    
+    # Bronze bars
+    frame_data.append(go.Bar(
+        y=top10_df['region'],
+        x=top10_df['Bronze'],
+        name='Brons',
+        orientation='h',
+        marker_color='#996B4F',
+        text=top10_df['Bronze'],
+        textposition='inside',
+        hovertemplate='Brons: %{x}<extra></extra>',
+        showlegend=False
+    ))
+    
+    # Silver bars
+    frame_data.append(go.Bar(
+        y=top10_df['region'],
+        x=top10_df['Silver'],
+        name='Silver',
+        orientation='h',
+        marker_color='#969696',
+        text=top10_df['Silver'],
+        textposition='inside',
+        hovertemplate='Silver: %{x}<extra></extra>',
+        showlegend=False
+    ))
+    
+    # Gold bars
+    frame_data.append(go.Bar(
+        y=top10_df['region'],
+        x=top10_df['Gold'],
+        name='Guld',
+        orientation='h',
+        marker_color='#9F8F5E',
+        text=top10_df['Gold'],
+        textposition='inside',
+        hovertemplate='Guld: %{x}<extra></extra>',
+        showlegend=False
+    ))
+    
+    # Create annotations for ranks (to the right of bars)
+    annotations = []
+    for idx, row in top10_df.iterrows():
+        annotations.append(dict(
+            x=row['Total'] + (top10_df['Total'].max() * 0.02),
+            y=row['region'],
+            text=f"#{int(row['Rank'])}",
+            showarrow=False,
+            font=dict(size=14, color='#333333', family='Arial Black'),
+            xanchor='left'
+        ))
+    
+    # Add Australia rank to title
+    aus_rank_text = f"Australia: #{aus_rank}" if aus_rank else "Australia: Not in top 10"
+    
+    frames.append(go.Frame(
+        data=frame_data,
+        name=str(selected_year),
+        layout=go.Layout(
+            annotations=annotations,
+            title=f'Topp 10 Länder OS {selected_year} - Totala Medaljer<br><sub>{aus_rank_text}</sub>'
+        )
+    ))
 
-all_years_data = []
-for year in sorted(medal_counts_per_year['Year'].unique()):
-    year_data = medal_counts_per_year[medal_counts_per_year['Year'] == year]
-    top_countries = get_top15_with_australia(year_data)
-    top_countries['Year'] = year
-    all_years_data.append(top_countries)
+# Create initial figure (first year)
+initial_year = olympic_years[0]
+year_data = medal_counts_per_year[medal_counts_per_year['Year'] == initial_year].copy()
+year_data = year_data.sort_values('Cumulative_Medals', ascending=False).reset_index(drop=True)
+year_data['Rank'] = range(1, len(year_data) + 1)
 
-final_data = pd.concat(all_years_data, ignore_index=True)
-final_data['Färger'] = final_data['region'].apply(
-    lambda x: 'Australia' if x == 'Australia' else 'Andra länder'
-)
-"""
-The Figure for medals to see who have the most medals
-"""
+top10 = year_data.head(10).copy()
+top10_with_medals = []
+for _, country_row in top10.iterrows():
+    country = country_row['region']
+    country_medals = medals_filtered[
+        (medals_filtered['region'] == country) & 
+        (medals_filtered['Year'] <= initial_year)
+    ]
+    medal_counts = country_medals.groupby('Medal').size().to_dict()
+    top10_with_medals.append({
+        'region': country,
+        'Rank': country_row['Rank'],
+        'Total': country_row['Cumulative_Medals'],
+        'Gold': medal_counts.get('Gold', 0),
+        'Silver': medal_counts.get('Silver', 0),
+        'Bronze': medal_counts.get('Bronze', 0)
+    })
+
+top10_df = pd.DataFrame(top10_with_medals)
+top10_df = top10_df.sort_values('Total', ascending=True)
+
+australia_rank = year_data[year_data['region'] == 'Australia']['Rank'].values
+aus_rank_text = f"Australia: #{int(australia_rank[0])}" if len(australia_rank) > 0 else "Australia: Not in top 10"
+
 # Create figure
-fig = px.bar(
-    final_data,
-    x='Cumulative_Medals',
-    y='region',
-    animation_frame='Year',
+fig = go.Figure()
+
+fig.add_trace(go.Bar(
+    y=top10_df['region'],
+    x=top10_df['Bronze'],
+    name='Brons',
     orientation='h',
-    color='Färger',
-    color_discrete_map={
-        'Australia': '#C4D600',
-        'Andra länder': '#BBBCBC'
-    },
-    labels={
-        'Cumulative_Medals': 'Totala Medaljer',
-        'region': 'Länder',
-        'Year': 'År'
-    },
-    range_x=[0, final_data['Cumulative_Medals'].max() * 1.1],
-    text='Rank'
+    marker_color='#996B4F',
+    text=top10_df['Bronze'],
+    textposition='inside',
+    hovertemplate='Brons: %{x}<extra></extra>'
+))
+
+fig.add_trace(go.Bar(
+    y=top10_df['region'],
+    x=top10_df['Silver'],
+    name='Silver',
+    orientation='h',
+    marker_color='#969696',
+    text=top10_df['Silver'],
+    textposition='inside',
+    hovertemplate='Silver: %{x}<extra></extra>'
+))
+
+fig.add_trace(go.Bar(
+    y=top10_df['region'],
+    x=top10_df['Gold'],
+    name='Guld',
+    orientation='h',
+    marker_color='#9F8F5E',
+    text=top10_df['Gold'],
+    textposition='inside',
+    hovertemplate='Guld: %{x}<extra></extra>'
+))
+
+# Add rank annotations to the right of bars
+for idx, row in top10_df.iterrows():
+    fig.add_annotation(
+        x=row['Total'] + (top10_df['Total'].max() * 0.02),
+        y=row['region'],
+        text=f"#{int(row['Rank'])}",
+        showarrow=False,
+        font=dict(size=14, color='#333333', family='Arial Black'),
+        xanchor='left'
+    )
+
+# Add frames
+fig.frames = frames
+
+# Add slider
+sliders = [dict(
+    active=0,
+    yanchor="top",
+    y=-0.15,
+    xanchor="left",
+    x=0.1,
+    currentvalue=dict(
+        prefix="År: ",
+        visible=True,
+        xanchor="center",
+        font=dict(size=16)
+    ),
+    steps=[dict(
+        method="animate",
+        args=[
+            [str(year)],
+            dict(
+                mode="immediate",
+                frame=dict(duration=500, redraw=True),
+                transition=dict(duration=300)
+            )
+        ],
+        label=str(year)
+    ) for year in olympic_years]
+)]
+
+fig.update_layout(
+    title=f'Topp 10 Länder OS {initial_year} - Totala Medaljer<br><sub>{aus_rank_text}</sub>',
+    xaxis_title='Antal Medaljer',
+    yaxis_title='',
+    barmode='stack',
+    height=600,
+    showlegend=True,
+    legend=dict(
+        orientation='h',
+        yanchor='bottom',
+        y=1.02,
+        xanchor='right',
+        x=1
+    ),
+    sliders=sliders,
+    hovermode='y unified',
+    paper_bgcolor='rgba(0, 0, 0, 0)',
+    plot_bgcolor='rgba(0, 0, 0, 0)',
+    xaxis=dict(range=[0, medal_counts_per_year.groupby('Year')['Cumulative_Medals'].max().max() * 1.05])
 )
 
-fig.update_traces(texttemplate='#%{text}', textposition='outside')
-fig.update_layout(
-    xaxis_title='Totala Medaljer',
-    yaxis_title='Länder',
-    yaxis={'categoryorder': 'total ascending'},
-    height=500,
-    showlegend=True,
-    paper_bgcolor="rgba(0, 0, 0, 0)",
-    plot_bgcolor="rgba(0, 0, 0, 0)",
-)
-fig.update_xaxes(showgrid=True)
+fig.update_xaxes(showgrid=True, gridcolor='lightgray')
 fig.update_yaxes(showgrid=False)
 """
 Here is for the sunburst chart to show how little winter OS is
@@ -362,8 +535,7 @@ def layout():
                                     className="card-title",
                                 ),
                                 html.H6("Antal sommar OS-medaljer", className="card-subtitle"),
-                                html.P("", className="card-subtitle"),
-                                html.P("-", id="medals_in_each_summer", className="card-subtitle", style={"font-weight": "italic", "font-size" : "1rem"}),
+                                html.P("-", id="medals_in_each_summer", className="card-subtitle", style={"margin-top": "0.5rem", "font-weight": "bold", "font-size" : "0.7rem"}),
                             ]
                         ),
                     ),
@@ -381,8 +553,7 @@ def layout():
                                     className="card-title",
                                 ),
                                 html.H6("Antal vinter OS-medaljer", className="card-subtitle"),
-                                html.P("", className="card-subtitle"),
-                                html.P("-", id="medals_in_each_winter", className="card-subtitle", style={"font-weight": "italic", "font-size" : "1rem"}),
+                                html.P("-", id="medals_in_each_winter", className="card-subtitle", style={"margin-top": "0.5rem","font-weight": "bold", "font-size" : "0.7rem"}),
                             ]
                         ),
                     ),
@@ -400,8 +571,7 @@ def layout():
                                     className="card-title",
                                 ),
                                 html.H6("Antal atleter med OS-medaljer", className="card-subtitle"),
-                                html.P("", className="card-subtitle"),
-                                html.P("-", id="medals_for_team_event", className="card-subtitle", style={"font-weight": "italic", "font-size" : "1rem"}), 
+                                html.P("-", id="medals_for_team_event", className="card-subtitle", style={"margin-top": "0.5rem","font-weight": "bold", "font-size" : "0.7rem"}), 
                             ]
                         ),
                     ),
