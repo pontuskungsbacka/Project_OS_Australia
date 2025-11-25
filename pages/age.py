@@ -14,6 +14,7 @@ PAGE_TITLE = "Åldersanalys"
 dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/age", order=2)
 
 australia_rows = df[(df['NOC'] == 'AUS') | (df['NOC'] == 'ANZ') ]
+australia_rows_uniqueID = australia_rows.drop_duplicates(subset=['ID'])
 
 def layout():
     australia_rows = df[(df['NOC'] == 'AUS') | (df['NOC'] == 'ANZ')]
@@ -122,7 +123,7 @@ def update_summary_cards_age(_):
     youngest_athlete = f"{youngest_athlete_value:.0f} år"
 
     # Calculate the age of the average australian participant
-    average_athlete_value = australia_rows['Age'].mean()
+    average_athlete_value = australia_rows_uniqueID['Age'].mean()
     average_athlete = f"{average_athlete_value:.0f} år"
     
     # Calculate the age of the oldest australian participant

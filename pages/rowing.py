@@ -13,6 +13,23 @@ PAGE_TITLE = "Rodd"
 
 dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/rowing", order=5)
 
+# första året rodd var med - variabel
+rowing_rows = df[df['Sport']=='Rowing']
+first_rowing = rowing_rows['Year'].min()
+first_rowing_year = str(f"{first_rowing:.0f} år") 
+
+# variablar för genomsnitt och max antal OS roddarna deltagit i
+unique_rower_IDs = rowing_rows["ID"].unique()
+years_rowing = []
+
+for person in unique_rower_IDs:
+    single_rower_years = rowing_rows[rowing_rows['ID']==person]["Year"].nunique()
+    years_rowing.append(single_rower_years)
+
+mean_years_rowing_value = sum(years_rowing) / len(years_rowing)
+mean_years_rowing = f"{mean_years_rowing_value:.1f}"
+
+max_years_rowing = max(years_rowing) 
 
 def layout():
     
@@ -50,7 +67,7 @@ def layout():
     )
 
     return [
-        html.H3("Rodd - alla länder", className="mb-3"),
+        html.H3("Rodd", className="mb-3"),
         html.P(
            """En analys av rodd i Olympiska spelen. Denna sida ger en sammanfattning av viktig statistik och
         visualiseringar av olika aspekter av rodd i de Olympiska spelen. Rodd är bara med i sommar-OS.
@@ -62,9 +79,7 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4(
-                                    "År 1900",
-                                    id="first-rowing-game",
+                                html.H4(str(first_rowing_year),
                                     className="card-title",
                                 ),
                                 html.H6("Första gången rodd var med i Olympiska spelen", className="card-subtitle"),
@@ -79,9 +94,7 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4(
-                                    "1,3 OS",
-                                    id="average-years-rowing",
+                                html.H4(str(mean_years_rowing),
                                     className="card-title",
                                 ),
                                 html.H6("Genomsnittligt antal gånger som rodd-deltagare tävlar i OS", className="card-subtitle"),
@@ -96,9 +109,7 @@ def layout():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4(
-                                    "8 OS", 
-                                    id="max-number-of-years-rowing",
+                                html.H4(str(max_years_rowing),
                                     className="card-title"
                                 ),
                                 html.H6("Högsta antalet OS som en person tävlat inom rodd", className="card-subtitle"),
