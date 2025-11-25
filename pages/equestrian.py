@@ -6,9 +6,12 @@ from dash import Input, Output, callback, dcc, html
 from load_data import load_olympics_data, remove_team_duplicated_medals
 import numpy as np
 
+# Page: main title, logo path, and page name
 TITLE = "Olympiska spelen Analys - Team Australien"
 OS_LOGO = "assets/olympic-logo.svg"
 PAGE_TITLE = "Ridning"
+
+# Register this file as a Dash page (title, URL, menu order)
 
 dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/equestrian", order=7)
 
@@ -17,18 +20,23 @@ df = load_olympics_data()
 df = remove_team_duplicated_medals(df, "Equestrianism")
 sport_equestrianism = df[df["Sport"] == "Equestrianism"]  
 
-
+# prepare equestrianism data. Group, filter, pivot and melt
 def prepare_equestrianism_data(selected_medal="ALL", selected_years=None):
-    """Förbereder equestrian-data"""
+    """Prepare equestrian-data"""
+
+    # only rows with medals
     sport_equestrianism_medals = sport_equestrianism[sport_equestrianism["Medal"].notna()]
     
+    # When specific years are choosen, filter dataset to only show them
     if selected_years:
         sport_equestrianism_medals = sport_equestrianism_medals[sport_equestrianism_medals["Year"].isin(selected_years)]
     
+    # sort medals per YEAR, NOC and type
     medals_sorted_per_year = (sport_equestrianism_medals.groupby(["Year", "NOC", "Medal"])
                             .size()
                             .reset_index(name="Count"))
 
+    #pivot to wide format - one medal type per column
     medals_all_years = medals_sorted_per_year.pivot_table(
         values="Count",
         index=["Year", "NOC"],
@@ -36,17 +44,19 @@ def prepare_equestrianism_data(selected_medal="ALL", selected_years=None):
         fill_value=0
     ).reset_index()
  
+    # Remove the column name from the header
     medals_all_years.columns.name = None
 
+    #total medal for all countries all years
     medals_all_years["Total"] = (
         medals_all_years["Gold"]
         + medals_all_years["Silver"]
         + medals_all_years["Bronze"]
     )
+
+    #remove float. Needed for dropdown.
     medals_all_years["Year"] = medals_all_years["Year"].astype(int)
  
-
-    ##########top10_per_year = medals_all_sorted.groupby("Year").head(10)
  
     # convert from wide to long format
     sorted_medals_melt = pd.melt(
@@ -57,18 +67,21 @@ def prepare_equestrianism_data(selected_medal="ALL", selected_years=None):
         value_name="Amount"
     )
 
+    # Filter the data to show only the selected medal type
     if selected_medal != "ALL":
         sorted_medals_melt = sorted_medals_melt[sorted_medals_melt["Medaltype"] == selected_medal]
    
     return sorted_medals_melt
+
+#sorted medals per year for dropdown
 years_sorted = sorted(sport_equestrianism["Year"].dropna().unique().astype(int))
+
+#dashcard summmary stats
 first_year = np.min(sport_equestrianism["Year"].unique())
 mean_age = np.mean(sport_equestrianism["Age"].dropna())
 gender_counts = sport_equestrianism["Sex"].value_counts()
 
 def layout():
-
-    ##########top10_per_year = medals_all_sorted.groupby("Year").head(10)
 
     sorted_medals_melt = prepare_equestrianism_data()
 
@@ -86,9 +99,9 @@ def layout():
         labels={"value": "Medals total", "NOC":"Region", "Medaltype":"Medals type"},
         barmode="stack"
     )
-    # kod nedan utvecklad med hjälp av Claude (Anthropic, 2025). Konversation: 16 november 2025:
-    #frågan var hur jag kunde få tydligare graf.
-
+    
+    # delar av kod nedan utvecklad med hjälp av Claude (Anthropic, 2025). Konversation: 16 november 2025:
+    # frågan var hur jag kunde få tydligare graf.
 
     fig_medals_equestrian.update_layout(                               
         xaxis_tickangle=-45,                         #vrider NOC text så den är lättare att läsa
