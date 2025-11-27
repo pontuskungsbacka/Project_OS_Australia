@@ -6,7 +6,7 @@ import plotly.express as px
 from load_data import load_olympics_data
 
 df = load_olympics_data()
-#Import stuff move later
+
 TITLE = "Olympiska spelen Analys - Team Australien"
 OS_LOGO = "assets/olympic-logo.svg"
 PAGE_TITLE = "Åldersanalys"
@@ -17,9 +17,6 @@ australia_rows = df[(df['NOC'] == 'AUS') | (df['NOC'] == 'ANZ') ]
 australia_rows_uniqueID = australia_rows.drop_duplicates(subset=['ID'])
 
 def layout():
-    australia_rows = df[(df['NOC'] == 'AUS') | (df['NOC'] == 'ANZ')]
-    australia_rows_uniqueID = australia_rows.drop_duplicates(subset=['ID'])
-
     fig_hist1 = px.histogram(   
         australia_rows_uniqueID, 
         x='Age', 

@@ -13,12 +13,12 @@ PAGE_TITLE = "Rodd"
 
 dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/rowing", order=5)
 
-# första året rodd var med - variabel
+# variable for first year of rowing in OS. Will be used in CARDS 
 rowing_rows = df[df['Sport']=='Rowing']
 first_rowing = rowing_rows['Year'].min()
 first_rowing_year = str(f"{first_rowing:.0f} år") 
 
-# variablar för genomsnitt och max antal OS roddarna deltagit i
+# also for cards - variables for average and max times athletes compete 
 unique_rower_IDs = rowing_rows["ID"].unique()
 years_rowing = []
 
@@ -28,12 +28,10 @@ for person in unique_rower_IDs:
 
 mean_years_rowing_value = sum(years_rowing) / len(years_rowing)
 mean_years_rowing = f"{mean_years_rowing_value:.1f}"
-
 max_years_rowing = max(years_rowing) 
 
 def layout():
-    
-    #histogram plot
+
     rowing_rows = df[df['Sport']=='Rowing']
     rowing_rows_uniqueID = rowing_rows.drop_duplicates(subset=['ID'])
 
@@ -46,21 +44,19 @@ def layout():
 
     #correlation plot
     corr_columns = rowing_rows[["Weight", "Height", "Medal"]]
-    corr_columns["Medal"].fillna(0, inplace=True) #ingen medalj blir 0
-    # alla medaljer blir 1
+    corr_columns["Medal"].fillna(0, inplace=True) # 0 instead of Nan
+    # put 1 instead of any meal
     corr_columns["Medal"].mask(corr_columns["Medal"].isin(["Bronze", "Silver", "Gold"]) , other=1, inplace=True)
-    # innan vi tar bort rader med saknad height elr weight rader har vi 10595 rows, sen 7794
+    # removing rows missing weight or height
     corr_columns.dropna(axis=0, how='any', subset=['Weight', 'Height'], inplace=True)
 
-    corr_table = corr_columns.corr(method="pearson") # create a correlation table with pandas
+    corr_table = corr_columns.corr(method="pearson")
 
-    # set up the correlation plot
     fig_corr= px.imshow(
-        # pass the correlation matrix,
+        
         corr_table,
         #show the correlation values in each cell,
         text_auto=True, 
-        # set the colour scale
         color_continuous_scale="RdYlGn",
         zmin=-1,
         zmax=1
