@@ -16,7 +16,7 @@ hockey_df = remove_team_duplicated_medals(df, "hockey")
 hockey_df = hockey_df[hockey_df["Medal"].notna()]
 aus_hockey = hockey_df[hockey_df["NOC"] == "AUS"]
 
-aus_long = (
+aus_hockey_medal_counts = (
     aus_hockey
     .groupby(["Year", "Sex", "Medal"])
     .size()
@@ -155,7 +155,7 @@ def layout():
 )
 
 def update_aus_hockey_graph(selected_sex):
-    dff = aus_long.copy()
+    dff = aus_hockey_medal_counts
     if selected_sex == "both":
         dff_plot = (dff.groupby(["Year", "Medal"])["Count"].sum().reset_index())
         title_suffix = "(Herr & Dam)"
@@ -179,5 +179,4 @@ def update_aus_hockey_graph(selected_sex):
         title=f"Australiens medaljer i landhockey per år{title_suffix}",
 
     )
-    hockey_medals = aus_long
     return fig
