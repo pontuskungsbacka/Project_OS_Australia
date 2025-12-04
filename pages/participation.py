@@ -6,29 +6,38 @@ import numpy as np
 from dash import Input, Output, callback, dcc, html
 from load_data import load_olympics_data
 
+# Page: main title, logo path, and page name
 TITLE = "Olympiska spelen Analys - Team Australien"
 OS_LOGO = "assets/olympic-logo.svg"
 PAGE_TITLE = "Deltagande"
 
+# Register this file as a Dash page (title, URL, menu order)
 dash.register_page(__name__, name=PAGE_TITLE, title=f"{PAGE_TITLE} | {TITLE}", path="/participation", order=0)
 
+#DF for the original data and filtering for Australia
 df = load_olympics_data()
     #merge "AUS" and "ANZ" to get both NOC:S
 australia = df[df["NOC"].isin(["AUS", "ANZ"])]   
 
+#prepare data for historical participation graph - groupby() turns year to index
 participation_historical_aus = (
-        australia.groupby(["Year", "Season"])["ID"]
+        australia.groupby(["Year", "Season"])["ID"]   #X = year/Season, Y = count of unique participants
         .nunique()
-        .reset_index(name="Participants") 
-    )#. groupby() turns year to index
-####### summary statisc 1) first year participating 2) first year winter participating 3) year with most participants
+        .reset_index(name="Participants")             #Turn index back to column
+    )                                                
+
+## summary statisc 1) first year participating 2) first year winter participating 3) year with most participants###
 first_year_part_summer = participation_historical_aus[participation_historical_aus["Season"]=="Summer"]["Year"].unique().min()
 first_winter_year_part = participation_historical_aus[participation_historical_aus["Season"]=="Winter"]["Year"].unique().min()
 most_participants_year = participation_historical_aus.loc[participation_historical_aus["Participants"].idxmax()]["Year"]
-def layout():
-   
-                                                                                                                      #  .nunique() content in y-axle
 
+# Layout of the page
+def layout():
+    """
+    The layout function builds the entire 'Participation' page.
+    It returns all Dash components (titles, cards, and the graph.
+    """
+     #  .nunique() content in y-axle
     fig_aus_overview= px.line(
         participation_historical_aus,
         x= "Year", 
